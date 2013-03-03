@@ -1,0 +1,81 @@
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  outline: none;
+}
+html { background: #fff; height: 101%; font-family: Arial, Verdana, Tahoma, sans-serif; }
+body { font-size: 62.5%; line-height: 1; padding-bottom: 75px; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
+ol, ul { list-style: none; }
+
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+img { border: 0; max-width: 100%; }
+
+h2 { display: inline-block; font-size: 1.9em; }
+
+p { font-size: 1.4em; line-height: 1.35em; color: #444; margin-bottom: 15px; }
+
+a { color: #6b7fdd; text-decoration: none; }
+a:hover { color: #111; text-decoration: none; }
+
+/** page outline **/
+#w { max-width: 900px; min-width: 350px; margin: 0 auto; padding-top: 35px; }
+
+/** form **/
+#options { display: block; }
+
+.cathead { display: block; }
+.cathead h2 { padding: 9px 22px; background: #a1c175; color: #fff; text-shadow: 0px 1px 0px #8aa56d; border-top-right-radius: 6px; -webkit-border-top-right-radius: 6px; -moz-border-radius-topright: 6px; border-top-left-radius: 64px; -webkit-border-top-left-radius: 6px; -moz-border-radius-topleft: 6px; }
+.cathead p { font-size: 1.2em; padding: 10px; color: #7c9a5f; background: #eff7e8; border-top: 1px solid #92af6a; }
+
+
+input[type=radio] { display: none; /* comment out to display all radio buttons */ }
+
+.horizontalFlex {
+    display: -webkit-box;
+    -webkit-box-align:center; /*This makes it so the icons shift vertically if the center text is long.*/
+}
+.box1 {
+    -webkit-box-flex: 1;
+}
+.box0 {
+    -webkit-box-flex: 0;
+}
+
+.catlinks {  }
+.catlinks .row { display: block; border-bottom: 1px solid #dbdbdb; margin-bottom: 5px; padding: 11px 4px; padding-bottom: 18px; font-size: 1.2em; }
+
+.catlinks .row h3 { display: inline-block; color: #5c5c5c; font-weight: bold; width: 140px; }
+.catlinks .row span { font-size: 0.9em; font-weight: bold; padding: 7px 8px; margin-right: 3px; border: 1px solid #fff; }
+
+.catlinks .row span:hover { border: 1px solid #dbdbdb; background: #eee; }
+
+.catlinks .row input[type=radio]:checked + span { background: #6b7fdd; color: #fff; border: 1px solid #6470a9; }
+.catlinks .row .catlinks .row input[type=radio]:checked + span:hover { background: #4964e1; }
+
+
+.catlinks .horizontalFlex { display: -webkit-box; -webkit-box-align:center; border-bottom: 1px solid #dbdbdb; margin-bottom: 5px; padding: 11px 4px; padding-bottom: 18px; font-size: 1.2em; }
+
+.catlinks .horizontalFlex h3 {  -webkit-box-flex: 0;  color: #5c5c5c; font-weight: bold; width: 140px; -webkit-box-flex: 0; }
+.catlinks .horizontalFlex span { font-size: 0.9em; font-weight: bold; padding: 7px 8px; margin-right: 3px; border: 1px solid #fff; }
+
+.catlinks .horizontalFlex span:hover { border: 1px solid #dbdbdb; background: #eee; }
+
+.catlinks .horizontalFlex input[type=radio]:checked + span { background: #6b7fdd; color: #fff; border: 1px solid #6470a9; }
+.catlinks .horizontalFlex .catlinks .row input[type=radio]:checked + span:hover { background: #4964e1; }
+
+.catlinks .horizontalFlex label { -webkit-box-flex: 0; }
+.catlinks .horizontalFlex .description { -webkit-box-flex: 1; }
+
+.catlinks .row h4.description { display: inline-block; color: #5c5c5c; font-weight: bold; width: 140px; }
+
+.SaveStatusBox { display: inline-block; color: #5c5c5c; font-weight: bold; width: 140px; }

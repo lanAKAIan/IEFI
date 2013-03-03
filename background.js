@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 /**
   * installOrUpdate
   * called when the extension is updated or installed... wow.
-  * anyway thsi way we can either provide a tutorial or notify of any changes since their version.
+  * anyway this way we can either provide a tutorial or notify of any changes since their version.
   * additionally this ensures we can add our icon into the intel page if it is already displayed when they install.
-  * NOTE: shoudl test that the injected stuff is there though...
+  * NOTE: should test that the injected stuff is there though...
   */
 function installOrUpdate(install_details){
 	switch (install_details.reason){
@@ -32,7 +32,8 @@ function installOrUpdate(install_details){
 						break;
 		case "update": 
 			//console.log('its an update');
-			//console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version); 
+			//console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version);
+            notifyUserOfUpdate();
 			break;
 		case "chrome_update": //do nothing we dont care for the moment. but this is basically if the actual version of chrome itself updates.
 		default: 
@@ -41,10 +42,11 @@ function installOrUpdate(install_details){
 	//regardless the case... we should add on any intel pages
 	try
 	{
+        /*We specifically are looking at all the tabs even if they are not currently visible incase the user has more than one intel page up*/
 		chrome.tabs.query({"windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
 			if(tabResults.length>0)
 			{
-				for(i = 0; i < tabResults.length; i++)
+				for(var i = 0; i < tabResults.length; i++)
 				{
 					//console.log('install or update calling showPageActionIfLoggedIn on tabId ' + tabResults[i].id);
 					showPageActionIfLoggedIn(tabResults[i].id)
@@ -58,6 +60,34 @@ function installOrUpdate(install_details){
 	}
 }
 
+
+/**
+ * Queries chrome for the current visible tab. Only looks for ingress.com/intel tabs
+ * @param {function} callback function to pass tab object to when found
+ * NOTE: windowType normal keeps us from getting results like the debug popup. Active makes sure we only care about the currently visible tab.
+*/
+function getVisibleTab(callback)
+{
+    try
+    {
+        chrome.tabs.query({"active": true, "windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
+            console.assert(tabResults.length == 1, tabResults.length > 1 ? "More Than one tab returned!" : "No tabs returned!");
+            if(tabResults.length>0)
+            {
+                callback(tabResults[0]);
+            }
+            else
+            {
+                console.info('No visible ingress tab detected.');
+            }
+        });
+    }
+    catch(e)
+    {
+        console.error('Problem detecting current visible tab. ' + e.message);
+    }
+}
+
 function getSavedViews( callback )
 {
 	//chrome.storage.sync.set({'savedViews': tempViews});
@@ -67,23 +97,19 @@ function getSavedViews( callback )
 
 function loadView(view)
 {
-	//console.log('eventPage.loadView(view) - recieved: ' + view.viewName);
-	//portToContentScript.postMessage({question: "LOAD_VIEW", "view": JSON.stringify(view)});
-	
-	//chrome.tabs.getSelected(null, function(tab) {
-	chrome.tabs.query({"active": true, "windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
-	console.assert(tabResults.length == 1, tabResults.length > 1 ? "More Than one tab returned!" : "No tabs returned!");
-	var tab = tabResults[0];
-		chrome.tabs.sendMessage(tab.id, {request: "LOAD_VIEW", view: JSON.stringify(view)}, function(response) {
-		});
-	});
+    //console.info('background.js loadView called with view ' + JSON.stringify(view));
+    var loadV = function(tab)
+    {
+        chrome.tabs.sendMessage(tab.id, {request: "LOAD_VIEW", view: JSON.stringify(view)}, function(response) { });
+    }
+    getVisibleTab(loadV);
 }
 
 //PAss me a view object not json!
 function saveView(view)
 {
-	//we shoudl already have a cache so this shoudl be fixed... anyway for now do this.
-	
+    view.guid = getGUID();
+	//we should already have a cache so this should be fixed... anyway for now do this.
 	//1. get the views
 	//2 once we got the viwes, add the new one
 	//3. update the display or not? may be calback aded to function?
@@ -152,35 +178,30 @@ function getCurrentView( callback )
 	//not get selected... sigh
 	
 	//Also these were getting the dubug page when i was debugging which broke everything lmao.
-	chrome.tabs.query({"active": true, "windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
-	console.assert(tabResults.length == 1, tabResults.length > 1 ? "More Than one tab returned!" : "No tabs returned!");
-	var tab = tabResults[0];
-	
-		chrome.tabs.sendMessage(tab.id, {request: "GET_VIEW" }, function(response)
-		{
-			//console.log('background we got viewInfo: ' +  response.viewInfo);
-			if(callback != undefined)
-			{
-				//console.log('background.getCurrentView has a callback in the sendmessage ' + typeof(response.viewInfo));
-				callback(response.viewInfo);
-			}
-			
-			//generateGoogleMapsLink(response.viewInfo);
-		});
-	});
-	//console.log('end getcurrentview!');
+
+    var getCurView = function(tab)
+    {
+        chrome.tabs.sendMessage(tab.id, {request: "GET_VIEW" }, function(response)
+        {
+            if(callback != undefined)
+            {
+                callback(response.viewInfo);
+            }
+        });
+    }
+    getVisibleTab(getCurView);
 }
 
 //add autoclose? take an object maybe instead?
 function generateTOAST(image, message, body)
 {
-		var notification = window.webkitNotifications.createNotification(
-    image ? image : '',                    			// The image.
-	message ? message : '',   
-	body ? body: '');
-  notification.show();
-  //also, lets return a reference of the notification incase we want to do extra
-  return(notification);
+    var notification = window.webkitNotifications.createNotification(
+        image ? image : '',                    			// The image.
+        message ? message : '',
+        body ? body: '');
+
+    //also, lets return a reference of the notification incase we want to do extra
+    return(notification);
 }
 
 //https://maps.google.com/?q=TheLatitudeOfTarget+TheLongetudeOfTarget+(TheNameOfThePlaceMarker)
@@ -201,6 +222,26 @@ function generateGoogleMapsLink(view, callback)
 	callback(link);
 }
 
+function notifyUserOfUpdate()
+{
+    var msg = "Click here to view the changelog.";
+    var img = "res/icon-48.png";
+    var title = "Intelligence Enhancer Updated to " + chrome.runtime.getManifest().version;
+    var notify = generateTOAST(img,title, msg);
+        notify.addEventListener(  'click', function(){displayChangelog();notify.cancel()});
+        var closein10 = function()
+        {
+            setTimeout(function(){notify.cancel()}, 10000);
+        }
+        notify.addEventListener( 'show', closein10);
+        notify.show();
+
+}
+
+function displayChangelog()
+{
+    chrome.tabs.create({ url: "http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog"});
+}
 
 //Zoom16 is the least you can zoom and still see lvl 0 portals.
 //leave out the decimal point here.
@@ -248,61 +289,86 @@ var sshotTabId = 100;
 function takeScreenshot()
 {
 	//first lets hide PII
-		chrome.tabs.query({"active": true, "windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
-		console.assert(tabResults.length == 1, tabResults.length > 1 ? "More Than one tab returned!" : "No tabs returned!");
-		var tab = tabResults[0];
-			chrome.tabs.sendMessage(tab.id, {request: "HIDE_PII"}, function(response) {
-			console.info('PII should be hidden');
-			//PII should be hidden
-			//Take actual screenshot
-			setTimeout(function(){
-				saveScreenshot();
-				//Show PII
-					chrome.tabs.sendMessage(tab.id, {request: "SHOW_PII"}, function(response) {
-						console.info('PII should be showing again');
-						});}, 1000);
-						});
-		});
+    var getCurView = function(tab)
+    {
+        chrome.tabs.sendMessage(tab.id, {request: "HIDE_PII"}, function(response) {
+            console.info('PII should be hidden');
+            //So we should be able to do this in a callback type situation but i had timing issues at first.
+            setTimeout(function(){
+                saveScreenshot(tab.windowId);
+                //Show PII
+                chrome.tabs.sendMessage(tab.id, {request: "SHOW_PII"}, function(response) {
+                    console.info('PII should be showing again');
+                });}, 1000);
+        });
+    }
+    getVisibleTab(getCurView);
 }
 
-function saveScreenshot() {
-  chrome.tabs.captureVisibleTab(null, function(img) {
-    var screenshotUrl = img;
-    var viewTabUrl = chrome.extension.getURL('screenshot.html?id=' + sshotTabId++)
-
-    chrome.tabs.create({url: viewTabUrl}, function(tab) {
-      var targetId = tab.id;
-
-      var addSnapshotImageToTab = function(tabId, changedProps) {
-        // We are waiting for the tab we opened to finish loading.
-        // Check that the the tab's id matches the tab we opened,
-        // and that the tab is done loading.
-        if (tabId != targetId || changedProps.status != "complete")
-          return;
-
-        // Passing the above test means this is the event we were waiting for.
-        // There is nothing we need to do for future onUpdated events, so we
-        // use removeListner to stop geting called when onUpdated events fire.
-        chrome.tabs.onUpdated.removeListener(addSnapshotImageToTab);
-
-        // Look through all views to find the window which will display
-        // the screenshot.  The url of the tab which will display the
-        // screenshot includes a query parameter with a unique id, which
-        // ensures that exactly one view will have the matching URL.
-        var views = chrome.extension.getViews();
-        for (var i = 0; i < views.length; i++) {
-          var view = views[i];
-          if (view.location.href == viewTabUrl) {
-			//view.document.getElementById('screenshot').src = screenshotUrl;
-            view.setScreenshotUrl(screenshotUrl);
-			console.log('tried to set screenshot');
-            break;
-          }
+/*
+ * Saves a screenshot on the current visible tab. windowId is optional, but it is suggested in order to not have issue when console is up.
+ *
+ * */
+function saveScreenshot(windowId) {
+    //check for a saved format, jpeg or png and use it.
+    var ss_format;
+    try
+    {
+        console.info('attempting to detect screenshot format');
+        if(IPP.StorageManager.getUserSettings().screenshot_format)
+        {
+            ss_format = IPP.StorageManager.getUserSettings().screenshot_format;
+            console.info('detected format ' + ss_format);
         }
-      };
-      chrome.tabs.onUpdated.addListener(addSnapshotImageToTab);
+        else
+        {
+            ss_format = "png";
+        }
+    }
+    catch(e)
+    {
+        console.error(e.message);
+    }
+    //IPP.StorageManager.getUserSettings().screenshot_format
+    chrome.tabs.captureVisibleTab((windowId ? windowId:null), { format: ss_format }, function(img) {
+        var screenshotUrl = img;
+        var viewTabUrl = chrome.extension.getURL('screenshot.html?id=' + sshotTabId++);
+
+        chrome.tabs.create({url: viewTabUrl}, function(tab) {
+          var targetId = tab.id;
+
+          var addSnapshotImageToTab = function(tabId, changedProps) {
+            // We are waiting for the tab we opened to finish loading.
+            // Check that the the tab's id matches the tab we opened,
+            // and that the tab is done loading.
+            if (tabId != targetId || changedProps.status != "complete")
+              return;
+
+            // Passing the above test means this is the event we were waiting for.
+            // There is nothing we need to do for future onUpdated events, so we
+            // use removeListner to stop geting called when onUpdated events fire.
+            chrome.tabs.onUpdated.removeListener(addSnapshotImageToTab);
+
+            // Look through all views to find the window which will display
+            // the screenshot.  The url of the tab which will display the
+            // screenshot includes a query parameter with a unique id, which
+            // ensures that exactly one view will have the matching URL.
+            //Specifically only queryies pages owned by this extension.
+
+            var potentialTabs = chrome.extension.getViews({"windowId": windowId, "type": "tab"});
+              var view;
+              for (var i = 0; i < potentialTabs.length; i++) {
+              view = potentialTabs[i];
+              if (view.location.href == viewTabUrl) {
+                    view.setScreenshotUrl(screenshotUrl);
+                console.log('tried to set screenshot');
+                break;
+              }
+            }
+          };
+          chrome.tabs.onUpdated.addListener(addSnapshotImageToTab);
+        });
     });
-  });
 }
 
 
@@ -322,9 +388,6 @@ function loggedIn(callback, tabId)
 				//console.log('background we got loginStatus: ' +  response.loginStatus);
 				if(callback != undefined)
 				{
-					//console.log('background.getLoggedIn has a callback in the sendmessage ' + typeof(response.loginStatus));
-					//console.log('background.getLoggedIn was told the status was ' + response.loginStatus);
-					//console.log('background.getLoggedIn is sending this to the callback...');
 					callback(response.loginStatus);
 				}
 			}
@@ -349,13 +412,12 @@ function showPageActionIfLoggedIn(aTabId)
 		else
 		{
 			//console.log('background.showPageActionIfLoggedIn.callback called not logged in status so, changing page before show');
-			chrome.pageAction.setPopup({tabId: aTabId, popup: "notLoggedIn.html"});
+			chrome.pageAction.setPopup( {tabId: aTabId, popup: "notLoggedIn.html"} );
 			//console.log('background.showPageActionIfLoggedIn.callback will now show the not logged in pageAction');
 			chrome.pageAction.show(aTabId);
 		}
 	}, aTabId);
 }
-
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -379,8 +441,75 @@ chrome.extension.onMessage.addListener(
 				chrome.pageAction.setPopup({tabId: sender.tab.id, popup: "notLoggedIn.html"});
 			}
 			chrome.pageAction.show(sender.tab.id);
+			
 	}
+	else if (request.message == "GET_USER_SETTINGS")
+	{
+			sendResponse({farewell: "goodbye"}); //close the connection.
+
+			chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_SETTINGS_UPDATED", "userSettings": IPP.StorageManager.getUserSettings()}, function(response) {
+				console.info('Tab got the message to update settings');	});
+
+        //This is not right.. but since we should be replacing anyway
+        chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_ALL_USER_DATA", "userData": IPP.StorageManager.getAllData()}, function(response) {
+            console.info('Tab got the message with all the userdata');	});
+			
+	}
+    else if (request.message == "GET_ALL_USER_DATA")
+    {
+        sendResponse({farewell: "goodbye", "userData": IPP.StorageManager.getAllData() }); //close the connection.
+
+        /*
+        chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_ALL_USER_DATA", "userData": IPP.StorageManager.getAllData()}, function(response) {
+            console.info('Tab got the message with all the userdata');	});*/
+    }
   });
+  
+//////////////////
+function updateUserSettings(updatedUserSettings)
+{
+	chrome.tabs.query({"windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
+		//We may get more than one tab, but thats ok... we want to update all of them.
+		console.log('updateUserSettings found ' + tabResults.length + ' ingress tabs');
+		console.log(JSON.stringify(tabResults));
+		
+		try
+		{
+			for(var tab in tabResults)
+			{
+
+				chrome.tabs.sendMessage(tabResults[tab].id, {request: "NOTIFY_SETTINGS_UPDATED", "userSettings": updatedUserSettings}, function(response) {
+					console.info('Tab got the message to update settings');	});
+			}
+		}
+		catch(e)
+		{
+			console.error('it appears we had a problem sending messages to the tabs: ' + e.message);
+		}
+			
+		});
+}
+/*******/
+//Testing notification of storage update
+
+//This section would right now be watching wrong area... move to options so it watches itself incase more than one is open.
+
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+//Namespace is sync or local... for now we dont care.
+//	console.log('namespace: ' + JSON.stringify(namespace));
+    console.log('changes: ' + JSON.stringify(changes));
+	if(typeof changes.userSettings !== "undefined")
+	{
+		console.log('it was a settings change.');
+		updateUserSettings(changes.userSettings.newValue)
+		//So the changes actually has the new version... so perhaps we will just send right on.
+		//We should probably store locally incase popup asks? and manage views and such...
+	}
+//TODO: we are not checking any other types... like the userViews...
+});
+/*******/
+
+/*end js file version test*/
 
 //This is so we can tell when they first install or if we do an update notify them of the update.
 //http://developer.chrome.com/extensions/runtime.html#event-onInstalled

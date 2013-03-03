@@ -1,0 +1,84 @@
+*
+{
+    color:#EBBC4A;
+    background-color:#262626;
+    white-space: nowrap
+}
+
+img
+{
+    width: 30px;
+    height: 30px;
+}
+
+.horizontalFlex {
+    display: -webkit-box;
+    -webkit-box-align:center; /*This makes it so the icons shift vertically if the center text is long.*/
+}
+
+.box1 {
+    -webkit-box-flex: 1;
+}
+
+.box0 {
+    -webkit-box-flex: 0;
+}
+
+#directLinks
+{
+
+    display: inline-block;
+    border: 1px solid #EBBC4A;
+    min-width: 500px;
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+}
+
+legend
+{
+    padding-left: 0px;
+    background-color: transparent;
+}
+
+#windowName
+{
+    display: inline-block;
+    border: 1px solid #EBBC4A;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+input {
+    width:100%;
+    background-color:#3A3F44;
+    color:#EBBC4A;
+    border-color:#EBBC4A;
+}
+
+.link_label
+{
+    min-width: 110px;
+}
+
+#closeButton
+{
+    height: 36px;
+    width: 36px;
+    margin-left: -4px;
+    margin-top: -2px
+}
+#closeDiv
+{
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    z-index: 100;
+    margin-top: 7px;
+    margin-left: -25px;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+}

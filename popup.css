@@ -30,6 +30,9 @@ img.screenshot
 	height: auto;
 	max-width:80%; 
 	max-height:80%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .screenshot>h2
@@ -100,7 +103,7 @@ z-index:1000;
 }
 
 input {
-width:100%;
+width:400px;
 background-color:#3A3F44;
 color:#EBBC4A;
 border-color:#EBBC4A;

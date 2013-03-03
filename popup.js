@@ -17,91 +17,50 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-document.addEventListener('DOMContentLoaded', function () {
-initPopup();
-});
+document.addEventListener('DOMContentLoaded', initPopup);
 var backgroundPage = chrome.extension.getBackgroundPage();
 
 function initPopup()
 {
-	document.getElementById("menu_saveView").addEventListener(  'click', function(){showSaveViewPage(true);});
-	document.getElementById("closeSaveButton").addEventListener('click', function(){showSaveViewPage(false);});
-	document.getElementById("performSaveButton").addEventListener('click', function(){POPUP.saveCurrentView()});
-	document.getElementById("menu_shareLink").addEventListener( 'click', function(){showShareLinkPage(true);});
-	document.getElementById("closeShareButton").addEventListener('click', function(){showShareLinkPage(false);});
-	document.getElementById("copy_intelDirectLink").addEventListener('click', function(){copyIntelToClipboard()});
-	document.getElementById("copy_gmapsDirectLink").addEventListener('click', function(){copyMapsToClipboard()});
-	document.getElementById("menu_screenshot").addEventListener('click', function(){POPUP.saveScreenshot()});
-	document.getElementById("menu_about").addEventListener('click', function(){loadAboutPage();});
-	
-	//document.getElementById("menu_gMapsLink").addEventListener( 'click', function(){POPUP.generateGMapsURL()});
-	//document.getElementById("menu_intelLink").addEventListener( 'click', function(){POPUP.generateIntelURL()});
-	//document.getElementById("DEBUG_MENU_ITEM").addEventListener('click', function(){checkLogin()});
-	
-	
+	document.getElementById("menu_saveView").addEventListener(  'click', showSaveView);
+	document.getElementById("menu_shareLink").addEventListener( 'click', showDirectLinks);
+	document.getElementById("menu_screenshot").addEventListener('click', POPUP.saveScreenshot);
+	document.getElementById("menu_about").addEventListener('click', loadAboutPage);
+	document.getElementById("menu_options").addEventListener('click', displayOptions);
+
+	//document.getElementById("DEBUG_MENU_ITEM").addEventListener('click', function(){});
 	//Populate the user's list of views
 	POPUP.loadSavedViews();
 }
 
+function redirectPopupTo(url)
+{
+    window.location.href = url;
+}
+
+function showSaveView()
+{
+    redirectPopupTo("saveView.html");
+}
+
+function showDirectLinks()
+{
+    redirectPopupTo("directLinks.html");
+}
+
+function displayOptions()
+{
+	chrome.tabs.create({ url: "options.html"});
+}
+
 function loadAboutPage()
 {
-	chrome.tabs.create({ url: "about.html" });
-}
-
-function copyIntelToClipboard()
-{
-	var linput = document.getElementById('input_intelDirectLink');
-	linput.focus();
-    linput.select();
-    document.execCommand("Copy");
-	document.getElementById('linkCopyStatus').innerText = "Link coppied to clipboard.";
-}
-
-function copyMapsToClipboard()
-{
-	var linput = document.getElementById('input_gmapsDirectLink');
-	linput.focus();
-    linput.select();
-    document.execCommand("Copy");
-	document.getElementById('linkCopyStatus').innerText = "Link coppied to clipboard.";
-}
-						
-function showSaveViewPage(show)
-{
-	overlay(); //cover the currentPopup
-	if(show)
-	{
-		document.getElementById('saveViewPage').style.display = 'block';
-		document.getElementById('input_saveViewName').focus();
-	}
-	else
-	{
-		document.getElementById('saveViewPage').style.display = 'none';
-	}
-}
-
-function showShareLinkPage(show)
-{
-	overlay(); //cover the currentPopup
-	if(show)
-	{
-		document.getElementById('input_intelDirectLink').value = '';
-		document.getElementById('input_gmapsDirectLink').value = '';
-		POPUP.generateGMapsURL(); //Load updated values
-		POPUP.generateIntelURL(); //Load updated values
-		document.getElementById('linkCopyStatus').innerText = '';
-		document.getElementById('shareLinkPage').style.display = 'block';
-	}
-	else
-	{
-		document.getElementById('shareLinkPage').style.display = 'none';
-	}
+	chrome.tabs.create({url: "http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/About"});
 }
 
 function checkLogin()
 {
-	backgroundPage.loggedIn(function(status)
-	{
+	backgroundPage.loggedIn(function(status){
 		if(status == true)
 		{
 			document.getElementById("viewList").innerText = "LogdedIn";
@@ -124,35 +83,6 @@ var POPUP = (function(){
 		backgroundPage.loadView(view);
 	}
 	
-	//Requests the current view in ingress be saved
-	p.saveCurrentView = function()
-	{
-		//console.info('retrieving view information, then saving it to local store.');
-		
-		// we need to prompt them for a view name.
-		var viewName = document.getElementById('input_saveViewName').value;
-		
-		//clear current value
-		document.getElementById('input_saveViewName').value = '';
-		
-		if(viewName == undefined || viewName.length == 0)
-		{
-			viewName = 'unnamed view';
-		}
-		
-		backgroundPage.getCurrentView(function(viewJSON)
-		{
-			//if(viewJSON != undefined){ console.log('popup.js.getCurrentView got view from backgroundPage: ' + viewJSON); }
-			//Call this function when we get the currentView.
-			var view = JSON.parse(viewJSON);
-			view.viewName = viewName;
-			backgroundPage.saveView(view);
-			POPUP.addViewToList(view);
-			showSaveViewPage(false);
-			//document.getElementById("infoBox").innerText = viewInfo; //from returned
-		});
-	}
-	
 	p.removeView = function(view, elem)
 	{
 		//console.info('popup.removeview caled with: ' + JSON.stringify(view));
@@ -164,9 +94,6 @@ var POPUP = (function(){
 			backgroundPage.removeView(view);
 			//We should do this another way... but for now...
 		}
-		
-		//NOTE: we should probably remove the display now... otherwise we have to close window =/ bummer
-		//ofcourse i did nto make a reference.
 	}
 	
 	//If you pass me a view object, I will modify the dom of the popup to add it to the list.
@@ -178,7 +105,6 @@ var POPUP = (function(){
 			newViewLink.addEventListener('click', function(){POPUP.loadView(view)}, false);
 		var icon = document.createElement("img");
 		icon.setAttribute("src", "res/ic_menu_mapmode.png");
-		//icon.addEventListener('click', function(){POPUP.loadView(view)});
 		newViewLink.appendChild(icon);
 		var nameCell = document.createElement("div");
 		nameCell.setAttribute("class","box1");
@@ -190,7 +116,6 @@ var POPUP = (function(){
 		{
 			nameCell.innerText = 'unnamed';
 		}
-		//nameCell.addEventListener('click', function(){POPUP.loadView(view)});
 		newViewLink.appendChild(nameCell);
 		icon = document.createElement("img");
 		icon.setAttribute("src", "res/ic_menu_delete.png");
@@ -222,55 +147,14 @@ var POPUP = (function(){
 		//NOTE: this is getting an array of viewobjects... not dealing with JSON at this point.
 		backgroundPage.getSavedViews(function(views){if(views != undefined){for (var i in views){ console.info('p.loadSavedViews.callback for background.getsavedviews JSON: ' + JSON.stringify(views[i])); p.addViewToList(views[i])} }});
 	}
-	
-	p.getCurrentView = function() //callbacks?
-	{
-		//console.log('p.getcurrentview reqested of background');
-		backgroundPage.getCurrentView();
-	}
-	
-	//Hey lets add ability to save screenshots
+
 	//May want to modify to add ability to pass it a view
 	//Add metadata for the view information that took the screenshot... and perhaps overlay image with some timestamps?
 	p.saveScreenshot = function()
 	{
-		//console.log('save screenshot clicked.');
+		console.log('save screenshot clicked.');
 		backgroundPage.takeScreenshot();
-	}
-	
-	//These shoudl probably be wrapers for versions that take a view... if no view provided we get the view using the functions we use for saving.
-	p.generateGMapsURL = function()
-	{
-		//console.log('in popup.generategooglemapslink');
-		backgroundPage.getCurrentView(function(view){
-			//console.log('in callback');
-			backgroundPage.generateGoogleMapsLink(view, setMapsLink)}); 
-	}
-	
-	p.generateIntelURL = function()
-	{
-			//console.log('in popup.generateintellink');
-			backgroundPage.getCurrentView(function(view){
-			//console.log('in callback');
-			backgroundPage.generateIngressIntelLink(view, setIntelLink)}); 
 	}
 	
 	return p;
 }());
-
-
-function setIntelLink(link)
-{
-	document.getElementById('input_intelDirectLink').value = link;
-}
-
-function setMapsLink(link)
-{
-	document.getElementById('input_gmapsDirectLink').value = link;
-}
-
-
-function overlay() {
-	el = document.getElementById("overlay");
-	el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
-}

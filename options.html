@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Intelligence Enhancer for Ingress Options</title>
+		<LINK href="options.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="options.js"></script>
+		<script type="text/javascript" src="Utilities.js"></script>
+	</head>
+	<body>
+<div id="w">
+	<form name="options" id="options" method="post" action="options.html">
+		<!--<header class="cathead">
+			<h2>Communications Panel</h2>
+			<p>What time was that really?</p>
+		</header>
+		<section class="catlinks">
+			<div class="horizontalFlex">
+				<h3>Default Tab</h3>
+				<label class="c"><input type="radio" name="comm_default_chat_tab" value="all" id="default_chat_all"><span>All</span></label>
+				<label class="c"><input type="radio" name="comm_default_chat_tab" value="faction" id="default_chat_faction"><span>Faction</span></label>
+				<h4 class="description">Allows you to set a default chat mode for when you load the intel page.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Past Dates</h3>
+				<label class="c"><input type="radio" name="comm_past_dates" value="date_only" id="date_only"><span>Date Only</span></label>
+				<label class="c"><input type="radio" name="comm_past_dates" value="date_time" id="date_time"><span>Date Time</span></label>
+				<h4 class="description">Gives you the option to know what time something happened, even if it was not on the current day.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Time Format</h3>
+				<label class="c"><input type="radio" name="comm_time_format" value="standard" id="time_format_standard"><span>Standard</span></label>
+				<label class="c"><input type="radio" name="comm_time_format" value="twentyfour" id="time_format_twentyfour"><span>Twenty-Four</span></label>
+				<h4 class="description">Changes the time format for present day and past dates.</h4>
+			</div>
+		</section>-->
+		
+		<header class="cathead">
+			<h2>Screenshots</h2>
+			<p>Adjust the visibility of interface sections when you save a screenshot.</p>
+		</header>
+		<section class="catlinks">
+            <div class="horizontalFlex">
+                <h3>Format</h3>
+                <label class="c"><input type="radio" name="screenshot_format" value="png" id="format_screenshot_png"><span>PNG</span></label>
+                <label class="c"><input type="radio" name="screenshot_format" value="jpeg" id="format_screenshot_jpeg"><span>JPEG</span></label>
+                <h4 class="description">The format the screenshot will generate in.</h4>
+            </div>
+			<div class="horizontalFlex">
+				<h3>Communications</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_comm" value="show" id="comm_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_comm" value="hide" id="comm_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The whole communications chat box.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Player Email</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_email" value="show" id="email_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_email" value="hide" id="email_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">Email as listed in the top right of intel page.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Player Name</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_nickname" value="show" id="nickname_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_nickname" value="hide" id="nickname_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The player nickname in Ingress.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Player Level and AP</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_ap" value="show" id="ap_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_ap" value="hide" id="ap_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The octagon displaying player level and progress towards next level.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Player XM</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_xm" value="show" id="xm_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_xm" value="hide" id="xm_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The green bar and text displaying how much XM you have.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Butter Bar(Status)</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_butter" value="show" id="butter_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_butter" value="hide" id="butter_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The box that lets you know when you have been idle.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Redeem Reward</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_reward" value="show" id="redeem_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_reward" value="hide" id="redeem_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">Passcode reward input and results section.</h4>
+			</div>
+			<!--This section not coded-->
+			<div class="horizontalFlex">
+				<h3>Search</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_search" value="show" id="search_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_search" value="hide" id="search_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The search box in the top right.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Other Clutter</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_clutter" value="show" id="clutter_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_clutter" value="hide" id="clutter_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">The MAP, INVESTIGATION, Community, and Invite sections.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Mind Units</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_mu" value="show" id="mu_screenshot_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="screenshot_visibility_mu" value="hide" id="mu_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">Mind Unit and Global Control HUD.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Google Maps Controls</h3>
+				<label class="c"><input type="radio" name="screenshot_visibility_controls" value="show" id="controls_screenshot_show"><span>Show</span></label>
+                <label class="c"><input type="radio" name="screenshot_visibility_controls" value="hide" id="controls_screenshot_hide"><span>Hide</span></label>
+				<h4 class="description">Google Maps zoom, mode(map/satellite), street view man, street view navigation controls. NOTE: Specifically leaves copyright.</h4>
+			</div>
+            <!--<div class="horizontalFlex">
+                <h3>Timestamp</h3>
+                <label class="c"><input type="radio" name="screenshot_visibility_timestamp" value="show" id="timestamp_screenshot_show"><span>Show</span></label>
+                <label class="c"><input type="radio" name="screenshot_visibility_timestamp" value="hide" id="timestamp_screenshot_hide"><span>Hide</span></label>
+                <h4 class="description">Displays a timestamp of when the screenshot was taken.</h4>
+            </div>-->
+            <!--<div class="horizontalFlex">
+                <h3>Direct View Link</h3>
+                <label class="c"><input type="radio" name="screenshot_visibility_link" value="show" id="link_screenshot_show"><span>Show</span></label>
+                <label class="c"><input type="radio" name="screenshot_visibility_link" value="hide" id="link_screenshot_hide"><span>Hide</span></label>
+                <h4 class="description">Displays a hyperlink to the current view being captured.</h4>
+            </div>-->
+            <div class="horizontalFlex">
+                <h3>Barely Advertise</h3>
+                <label class="c"><input type="radio" name="screenshot_visibility_advertise" value="show" id="advertise_screenshot_show"><span>Show</span></label>
+                <label class="c"><input type="radio" name="screenshot_visibility_advertise" value="hide" id="advertise_screenshot_hide"><span>Hide</span></label>
+                <h4 class="description">Let everyone know how about this tool by adding a small Intelligence Enhancer for Ingress icon to the screenshot.</h4>
+            </div>
+			<!--END This section not coded-->
+		</section>
+        <!--<header class="cathead">
+            <h2>Auto Loading</h2>
+            <p>Default views for every occasion! (Does not override direct links.)</p>
+        </header>
+        <section class="catlinks">
+            <div class="horizontalFlex">
+                <h3>Fresh Browser</h3>
+                <label class="c"><input type="radio" name="auto_load_fresh" value="world" id="auto_load_fresh_world"><span>World</span></label>
+                <label class="c"><input type="radio" name="auto_load_fresh" value="geo" id="auto_load_fresh_geolocation"><span>Geo-Location</span></label>
+                <label class="c"><input type="radio" name="auto_load_fresh" value="saved" id="auto_load_fresh_saved"><span>Saved View</span></label>
+                <h4 class="description">By default, ingress.com/intel will load a full world view when it loads in a fresh browser. Setting to "Geo-Location" will attempt to detect your current location and load a view centered there. Setting to "Saved View" will attempt to load your selected saved view.<br>NOTE: "Geo-location" requires additional extension permissions.</h4>
+            </div>
+            <div class="horizontalFlex">
+                <h3>New Page Load</h3>
+                <label class="c"><input type="radio" name="auto_load_page" value="last" id="auto_load_page_last"><span>Last</span></label>
+                <label class="c"><input type="radio" name="auto_load_page" value="geo" id="auto_load_page_geolocation"><span>Geo-Location</span></label>
+                <label class="c"><input type="radio" name="auto_load_page" value="saved" id="auto_load_page_saved"><span>Saved View</span></label>
+                <h4 class="description">If set to saved view, the ingress.com/intel default use of a cached value from last page load will be overridden with the selected view.</h4>
+            </div>
+            <div class="horizontalFlex">
+                <h3>Saved View</h3>
+                <select name="auto_load_view" id="auto_load_view">
+                    <option value="4c61d239-d4b5-43c3-99df-ad9c2ecdc1cc">The world!</option>
+                    <option value="317e88ae-1d6d-4bde-84b7-c51ea26cbd59">Camarillo</option>
+                    <option value="05787b37-d019-47db-8de0-c219f2770aab">Thousand Oaks</option>
+                </select>
+                <h4 class="description">The view that will be used for the "Fresh Browser" and "New Page Load" options.</h4>
+            </div>
+            <div class="horizontalFlex">
+                <h3>Zoom Level</h3>
+                <select name="auto_load_geo_zoom" id="auto_load_geo_zoom">
+                    <option value= "1">01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L8 Portals</option>
+                    <option value= "2">02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L8 Portals</option>
+                    <option value= "3">03&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L7-L8 Portals</option>
+                    <option value= "4">04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L7-L8 Portals</option>
+                    <option value= "5">05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L6-L8 Portals</option>
+                    <option value= "6">06&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L6-L8 Portals</option>
+                    <option value= "7">07&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L5-L8 Portals</option>
+                    <option value= "8">08&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L5-L8 Portals</option>
+                    <option value= "9">09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L4-L8 Portals</option>
+                    <option value="10">10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L4-L8 Portals</option>
+                    <option value="11">11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L3-L8 Portals</option>
+                    <option value="12">12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L3-L8 Portals</option>
+                    <option value="13">13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L2-L8 Portals</option>
+                    <option value="14">14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L2-L8 Portals</option>
+                    <option value="15">15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L1-L8 Portals</option>
+                    <option value="16">16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                    <option value="17">17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                    <option value="18">18&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                    <option value="19">19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                    <option value="20">20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                    <option value="21">21&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L0-L8 Portals</option>
+                </select>
+                <h4 class="description">For the "Geo-Location" options, this is the default zoom level the view will load with. Higher numbers indicate increased magnification.</h4>
+            </div>
+        </section>-->
+		<header class="cathead">
+			<h2>Other</h2>
+			<p>Where else would we put them?</p>
+		</header>
+		<section class="catlinks">
+			<div class="horizontalFlex">
+				<h3>Cleanse Passcodes</h3>
+				<label class="c"><input type="radio" name="redeem_passcode_cleanse" value="on" id="cleanse_passcodes_on"><span>On</span></label>
+				<label class="c"><input type="radio" name="redeem_passcode_cleanse" value="off" id="cleanse_passcodes_off"><span>Off</span></label>
+				<h4 class="description">Automatically trims whitespace(new lines, spaces, etc) from input box before submitting. Im looking at you Decode Ingress.</h4>
+			</div>
+		</section>
+		<!--<button id="getJSON" type="button">getJSON</button>-->
+		<button id="saveButton" type="button">Save Changes</button><div id="SaveStatusBox"></div>
+
+	</form>
+</div>
+</body>

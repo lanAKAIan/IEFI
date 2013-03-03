@@ -7,89 +7,52 @@
 	<body>
 		<div id="main_menu">
 			<div id="menu_saveView" class="horizontalFlex menuRow">
-				<img src="res/icon-128-menu.png"></img>
+				<img src="res/icon-128-menu.png">
 				<div class="box1">Save View</div>
 			</div>
-<!--			<div id="menu_gMapsLink" class="horizontalFlex menuRow">
-				<img src="res/gmaps.png"></img>
-				<div class="box1">Generate Google Maps Link</div>
-			</div>
-			<div id="menu_intelLink" class="horizontalFlex menuRow">
-				<img src="res/Ingress_logo_512px con link.png"></img>
-				<div class="box1">Generate /intel Link</div>
-			</div>-->
 			<div id="menu_shareLink" class="horizontalFlex menuRow">
-				<img src="res/ic_menu_share.png"></img>
+				<img src="res/ic_menu_share.png">
 				<div class="box1">Generate Direct Links to View</div>
 			</div>
 			<div id="menu_screenshot" class="horizontalFlex menuRow">
-				<img src="res/ic_menu_camera.png"></img>
+				<img src="res/ic_menu_camera.png">
 				<div class="box1">Screenshot Current Intel</div>
 			</div>
 			<div id="menu_about" class="horizontalFlex menuRow">
-				<img src="res/ic_menu_info_details.png"></img>
+				<img src="res/ic_menu_info_details.png">
 				<div class="box1">About Intelligence Enhancer for Ingress</div>
 			</div>
+			<div id="menu_options" class="horizontalFlex menuRow">
+				<img src="res/equalizer.png">
+				<div class="box1">Settings</div>
+			</div>
 			<!--<div id="DEBUG_MENU_ITEM" class="horizontalFlex menuRow">
-				<img src="res/ic_menu_info_details.png"></img>
-				<div class="box1">DEBUG</div>
-			</div>-->
+				<img src="res/ic_menu_info_details.png">
+				<div class="box1">DEBUG</div>-->
+			</div>
 		</div>
 		<fieldset id="viewList">
 			<legend>Saved Views:</legend>
 			<div class="horizontalFlex menuRow">
-				<img src="res/ic_menu_mapmode.png"></img>
+				<img src="res/ic_menu_mapmode.png">
 				<div class="box1">Unfortunately bugs happen, and you are looking at one</div>
-				<img src="res/ic_menu_delete.png"></img>
+				<img src="res/ic_menu_delete.png">
 			</div>
 			<div class="horizontalFlex menuRow">
-				<img src="res/ic_menu_mapmode.png"></img>
+				<img src="res/ic_menu_mapmode.png">
 				<div class="box1">This is a view name and it will fit. Infact lets assume it was way too long, lets see what happened. if we have any luck it will wrap and move the surrounding icons down.</div>
-				<img src="res/ic_menu_delete.png"></img>
+				<img src="res/ic_menu_delete.png">
 			</div>
 			<div class="horizontalFlex menuRow">
-				<img src="res/ic_menu_mapmode.png"></img>
+				<img src="res/ic_menu_mapmode.png">
 				<div class="box1">Now this one Ontheotherhandjustkeepsgoingsotheyreallyneedtodosomethinglike...idonobreakitsomehow.</div>
-				<img src="res/ic_menu_delete.png"></img>
+				<img src="res/ic_menu_delete.png">
 			</div>
 			<div class="horizontalFlex menuRow">
-				<img src="res/ic_menu_mapmode.png"></img>
+				<img src="res/ic_menu_mapmode.png">
 				<div class="box1">This is a view name and it will fit.</div>
-				<img src="res/ic_menu_delete.png"></img>
+				<img src="res/ic_menu_delete.png">
 			</div>
 		</fieldset>
-		<div id="overlay">
-			<div id="saveViewPage">
-				<fieldset class="saveViewNostyle">
-					<legend>Save View</legend>
-					<input id="input_saveViewName" class="saveName" placeholder="enter view name">
-					<img id="performSaveButton" src="res/ic_menu_save.png" title="Save View">
-					<img id="closeSaveButton" src="res/ic_menu_close_clear_cancel.png" title="Cancel">
-				</fieldset>
-			</div>
-			<div id="shareLinkPage">
-				<fieldset class="saveViewNostyle">
-					<legend>Direct Links</legend>
-					<div id="directLinkIntel" class="horizontalFlex">
-						<img src="res/Ingress_logo_512px con link.png"></img>
-						<div class="box0"> ingress.com/intel: </div>
-						<div class="box1"><input id="input_intelDirectLink" class="directLink" readonly="readonly" placeholder="calculating..."/></div>
-						<div class="box0"><button id="copy_intelDirectLink" />Copy</button></div>
-					</div>
-					<div id="directLinkGMaps" class="horizontalFlex">
-						<img src="res/gmaps.png"></img>
-						<div class="box0"> google maps: </div>
-						<div class="box1"><input id="input_gmapsDirectLink" class="directLink" readonly="readonly" placeholder="calculating..."/></div>
-						<div class="box0"><button id="copy_gmapsDirectLink" />Copy</button></div>
-					</div>
-					<div class="horizontalFlex">
-						<div class="box1" id="linkCopyStatus"></div>
-					</div>
-					<div class="horizontalFlex">
-						<div class="box1"><img id="closeShareButton" src="res/ic_menu_close_clear_cancel.png" title="Close"></div>
-					</div>
-				</fieldset>
-			</div>
-		</div>
 	</body>
 </html>

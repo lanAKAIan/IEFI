@@ -1,6 +1,6 @@
 {
   "name": "Intelligence Enhancer for Ingress",
-  "version": "1.0.2.0",
+  "version": "1.1.0.30",
   "manifest_version": 2,
   "description": "Provides enhanced functionality to the ingress.com/intel site.",
   "page_action": {
@@ -12,16 +12,17 @@
              "48": "res/icon-48.png",
             "128": "res/icon-128.png" },
   "content_scripts": [ {
-      "js": [ "contentScript.js"],
+      "js": [ "contentScript.js" ],
 	  "matches": [ "http://www.ingress.com/intel*" ],      
 	  "run_at": "document_end" } ],
+  "options_page": "options.html",
   "permissions" : [
     "tabs",
 	"storage",
 	"notifications",
 	"clipboardWrite",
 	"http://www.ingress.com/intel*" ],
-  "optional_permissions": [	],
-  "background": { "scripts": [ "background.js" ] },
-  "web_accessible_resources": [ "injectScript.js" ]
+  "optional_permissions": ["geolocation"],
+  "background": { "scripts": [ "background.js", "StorageManager.js", "Utilities.js" ] },
+  "web_accessible_resources": [ "injectScript.js", "res/icon-128-menu.png", "res/icon-48.png"]
 }
