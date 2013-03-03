@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intelligence Enhancer for Ingress - Import/Export.</title>
+    <script type="text/javascript" src="lib\FileSaver.js"></script>
+    <script type="text/javascript" src="Utilities.js"></script>
+    <script type="text/javascript" src="importExport.js"></script>
+</head>
+<body>
+<!--accept="application/json"-->
+<input type="file" id="file" name="file" accept=".json,application/json"/>
+<output id="list"></output>
+
+<pre><textarea id="data" style="width: 100%; min-height: 600px" readonly></textarea></pre>
+<button id="export">Get Current Settings</button><button id="import">Import Settings</button>
+
+<label>Save As: <input type="text" id="saveFileName" placeholder="iefi_settings_TIMESTAMP.json"></label><button id="SaveToDisk">Save</button>
+
+</body>
+</html>
+

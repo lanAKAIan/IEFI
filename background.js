@@ -91,7 +91,7 @@ function getVisibleTab(callback)
 function getSavedViews( callback )
 {
 	//chrome.storage.sync.set({'savedViews': tempViews});
-	chrome.storage.sync.get('savedViews', function(r){callback(r.savedViews);});
+	chrome.storage.sync.get('userViews', function(r){callback(r.userViews);});
 	//console.log('done!');
 }
 
@@ -113,11 +113,11 @@ function saveView(view)
 	//1. get the views
 	//2 once we got the viwes, add the new one
 	//3. update the display or not? may be calback aded to function?
-	chrome.storage.sync.get('savedViews', function(r){
+	chrome.storage.sync.get('userViews', function(r){
 											var x;
-											if(r.savedViews != undefined)
+											if(r.userViews != undefined)
 											{
-												x = r.savedViews
+												x = r.userViews
 											}
 											else
 											{
@@ -128,7 +128,7 @@ function saveView(view)
 											x[x.length] = view;
 											
 											//r[r.length] = view;
-										  chrome.storage.sync.set({"savedViews": x}, function() {
+										  chrome.storage.sync.set({"userViews": x}, function() {
 																						console.info('view added to storage');})
 																						});
 }
@@ -142,9 +142,9 @@ function removeView(view)
 	//2 once we got the viwes, add the new one
 	//3. update the display or not? may be calback aded to function?
 	//console.log('background.js.remove view called with ' + view);
-	chrome.storage.sync.get('savedViews', function(r){
+	chrome.storage.sync.get('userViews', function(r){
 											//console.info('savedViews length pre remove:' + r.savedViews.length);
-											var x = r.savedViews;
+											var x = r.userViews;
 											var removeView = JSON.stringify(view);
 											var i=0;
 											while(i < x.length)
@@ -162,7 +162,7 @@ function removeView(view)
 												i++;
 											}
 											//console.info('savedViews length post remove:' + r.savedViews.length);
-										  chrome.storage.sync.set({"savedViews": x}, function() {
+										  chrome.storage.sync.set({"userViews": x}, function() {
 																						console.info('view removed from storage');})
 																						});
 	
@@ -475,6 +475,11 @@ chrome.extension.onMessage.addListener(
 				//console.info('user not logged in so showing pageaction non not logged in');
 				chrome.pageAction.setPopup({tabId: sender.tab.id, popup: "notLoggedIn.html"});
 			}
+            if(typeof request.dashboardURI !== "undefined")
+            {
+                //Ok we got a new page load, and it seems we detected the dashboard version.
+
+            }
 			chrome.pageAction.show(sender.tab.id);
 			
 	}
@@ -502,15 +507,24 @@ chrome.extension.onMessage.addListener(
     {
         sendResponse({farewell: "goodbye"}); //close the connection.
 
-        var compatFunc = function(compatibility)
+        var compatFunc = function(compatibilityObj)
         {
-            notifyUserOfCompatibility(compatibility)
-            chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_INIT_DATA", "userData": IPP.StorageManager.getAllData(), "compatibility": compatibility}, function(response) {
+            notifyUserOfCompatibility(compatibilityObj)
+            chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_INIT_DATA", "userData": IPP.StorageManager.getAllData(), "compatibility": compatibilityObj.compatibility}, function(response) {
                 console.info('Tab CS got the message with all the initialization data');	});
+        }
+        var dashboardURI;
+        if(typeof request.dashboardURI !== "undefined")
+        {
+            dashboardURI = request.dashboardURI;
+        }
+        else
+        {
+            dashboardURI = "https://www.ingress.com/jsc/gen_dashboard.js";
         }
 
         //A new page load, so we want to check compatibility.
-        checkCompatibility(compatFunc, extensionCompatibility);
+        checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
     }
     else if (request.message == "TOTAL-CONVERSION-DETECTED")
     {
@@ -550,6 +564,11 @@ function updateUserSettings(updatedUserSettings)
 //Testing notification of storage update
 
 //This section would right now be watching wrong area... move to options so it watches itself incase more than one is open.
+
+function displayImportExport()
+{
+    chrome.tabs.create({ url: "importExport.html"});
+}
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
 //Namespace is sync or local... for now we dont care.

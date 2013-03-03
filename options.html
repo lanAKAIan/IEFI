@@ -33,7 +33,6 @@
 				<h4 class="description">Changes the time format for present day and past dates.</h4>
 			</div>-->
 		</section>
-		
 		<header class="cathead">
 			<h2>Screenshots</h2>
 			<p>Adjust the visibility of interface sections when you save a screenshot.</p>
@@ -109,8 +108,14 @@
 				<h3>Google Maps Controls</h3>
 				<label class="c"><input type="radio" name="screenshot_visibility_controls" value="show" id="controls_screenshot_show"><span>Show</span></label>
                 <label class="c"><input type="radio" name="screenshot_visibility_controls" value="hide" id="controls_screenshot_hide"><span>Hide</span></label>
-				<h4 class="description">Google Maps zoom, mode(map/satellite), street view man, street view navigation controls. NOTE: Specifically leaves copyright.</h4>
+				<h4 class="description">Google Maps zoom, mode(map/satellite), street view man, street view navigation controls.<br>NOTE: Specifically leaves copyright information intact.</h4>
 			</div>
+            <div class="horizontalFlex">
+                <h3>Zoom Level Indicator</h3>
+                <label class="c"><input type="radio" name="screenshot_visibility_zoom" value="show" id="screenshot_visibility_zoom_show"><span>Show</span></label>
+                <label class="c"><input type="radio" name="screenshot_visibility_zoom" value="hide" id="screenshot_visibility_zoom_hide"><span>Hide</span></label>
+                <h4 class="description">The indicator of which portal levels are showing on the map.</h4>
+            </div>
             <!--<div class="horizontalFlex">
                 <h3>Timestamp</h3>
                 <label class="c"><input type="radio" name="screenshot_visibility_timestamp" value="show" id="timestamp_screenshot_show"><span>Show</span></label>
@@ -131,7 +136,7 @@
             </div>
 			<!--END This section not coded-->
 		</section>
-        <!--<header class="cathead">
+        <header class="cathead">
             <h2>Auto Loading</h2>
             <p>Default views for every occasion! (Does not override direct links.)</p>
         </header>
@@ -186,7 +191,7 @@
                 </select>
                 <h4 class="description">For the "Geo-Location" options, this is the default zoom level the view will load with. Higher numbers indicate increased magnification.</h4>
             </div>
-        </section>-->
+        </section>
 		<header class="cathead">
 			<h2>Other</h2>
 			<p>Where else would we put them?</p>
@@ -201,7 +206,6 @@
 		</section>
 		<!--<button id="getJSON" type="button">getJSON</button>-->
 		<button id="saveButton" type="button">Save Changes</button><div id="SaveStatusBox"></div>
-
 	</form>
 </div>
 </body>

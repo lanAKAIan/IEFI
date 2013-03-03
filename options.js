@@ -17,7 +17,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 var backgroundPage = chrome.extension.getBackgroundPage();
-    SM = chrome.extension.getBackgroundPage().IPP.StorageManager;
+var SM = backgroundPage.IPP.StorageManager;
 document.addEventListener('DOMContentLoaded', function () {
   initOptions();
 //document.getElementById('getJSON').addEventListener('click', function(){alert(getJSON()); return false;});
@@ -74,10 +74,35 @@ function saveChanges()
 
 function GetCurrentSettings()
 {
-	//gets the json for all the settings on the page. i hope.
-	var allOptions = document.getElementsByTagName('input');
-	var i = 0;
-	var out = {};
+    var allOptions = document.querySelectorAll("input, select");
+    var out = {}; //This is what we will ultimately save
+    var i = 0; // your everyday counter.
+
+    //Verify any settings...
+    try
+    {
+        //Ensure that if they want to load a view by default, there better be one selected. NOTE: value would never be null, but would be empty string
+        if(allOptions["auto_load_view"].value.length == 0 || allOptions["auto_load_view"].value == "undefined")
+        {
+            allOptions["auto_load_view"].value = null; //Will set it to blank string.
+            if(allOptions["auto_load_fresh_saved"].checked)
+            {
+                allOptions["auto_load_fresh_saved"].checked = false;
+                allOptions["auto_load_fresh_world"].checked = true;
+            }
+            if(allOptions["auto_load_page_saved"].checked)
+            {
+                allOptions["auto_load_page_saved"].checked = false;
+                allOptions["auto_load_page_last"].checked = true;
+            }
+        }
+    }
+    catch(e)
+    {
+        console.error("Unable to convert " + e.message);
+    }
+
+    //set up save
 	for(i=0; i < allOptions.length; i++)
 	{
 		//console.log(allOptions[i].id + ' ' + allOptions[i].checked);
@@ -89,14 +114,18 @@ function GetCurrentSettings()
             }
 			//outputJSON += ', "' + allOptions[i].name + '": "' + allOptions[i].value + '"';
 		}
-	}
+        else if(allOptions[i].type == 'select-one') //for the select lists... just happens to be this type even though not an input.
+        {
+            //selects have a value of empty string if not set. Even if you set them to null it ends up that way.
+            out[allOptions[i].name] = allOptions[i].value.length ? allOptions[i].value: null;
 
-    //now the selects
-    allOptions = document.getElementsByTagName('select');
-    for(i=0; i < allOptions.length; i++)
-    {
-        out[allOptions[i].name] = allOptions[i].value;
-    }
+            //Unfortunately we allways will get a string back... so lets just convert it.
+            if(allOptions[i].name === "auto_load_geo_zoom")
+            {
+                out[allOptions[i].name] = parseInt(out[allOptions[i].name], 10);
+            }
+        }
+	}
 
 	return(out);
 }
@@ -106,10 +135,9 @@ function initOptions()
 	var settings = SM.getUserSettings();
 
     fillViewList();
-	
-	//Right now we are just going to init from default options
+
 	var allOptions = document.getElementsByTagName('input');
-	//console.log(allOptions.length);
+
 	var i = 0;
 	for(i=0; i < allOptions.length; i++)
 	{
@@ -133,10 +161,6 @@ function initOptions()
 				}
 			}
 		}
-        else if(allOptions[i].type == 'select')
-        {
-            allOptions[i].value = settings[key];
-        }
 	}
 
     //Handle any selects
@@ -150,6 +174,7 @@ function initOptions()
             {
                 //console.log('Match');
                 allOptions[i].value = settings[key];
+                //If the value is not actually in the list, the value will end up as an empty string which is good.
             }
             else
             {
@@ -157,6 +182,8 @@ function initOptions()
             }
         }
     }
+
+    //GetCurrentSettings();//This is going to basically verify the settings on load.
 }
 
 function fillViewList()
@@ -167,7 +194,7 @@ function fillViewList()
 
     if(viewList != null)
     {
-
+        //empty the view list
         while (viewList.firstChild) {
             viewList.removeChild(viewList.firstChild);
         }
@@ -181,6 +208,7 @@ function fillViewList()
             viewOption.appendChild(viewName);
               viewList.appendChild(viewOption);
 
+        //add the real ones
         for(v in userViews)
         {
             viewOption = document.createElement("option");
@@ -192,9 +220,6 @@ function fillViewList()
             viewList.appendChild(viewOption);
         }
     }
-
-    //now pick the value if in the userstore
-    //viewList.value = SM.getUserSettings().auto_load_view;
 }
 
 function setRadio(option_group, set_to_value)

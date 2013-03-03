@@ -30,21 +30,25 @@ if(!IPP.Injected){ IPP.Injected = {} };
     //"somestringToRegex".replace(/(\(|\)|\.|\\)/g, '\\$1').replace(/([a-zA-Z$_]+)/g, '[a-zA-Z$_]+');
 	var signatures = {};
 		signatures.nativeFunction   = /\{ \[native code\] \}/;
-        signatures.redeem           = /var a\s*=\s*document\.getElementById\("passcode"\),\s*b =\s*a\.value;/; //Can have or not have spaces.
-        signatures.geocode          = /document\.getElementById\("address"\)/;
+        signatures.redeem           = /var\s+[a-zA-Z_$]+\s*=\s*document\.getElementById\("passcode"\),\s*[a-zA-Z_$]+\s*=\s*[a-zA-Z_$]+\.value;/;
+        signatures.geocode          = /document\.getElementById\("address"\)/; //Now called doGeocode
         signatures.map_in_geocode   = /([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+)\.fitBounds\([a-zA-Z_$]+\)/;
-        signatures.cookieParser     = /return [a-zA-Z_$]+\("ingress\.intelmap\." \+ [a-zA-Z_$]+\)/;
-        signatures.mapConstructor   = /([a-zA-Z_$]+\.[a-zA-Z_$]+) = new google\.maps\.Map\(document\.getElementById\("map_canvas"\)\, [a-zA-Z_$]+\);/;
-        signatures.chatCreation     = /[a-zA-Z_$]+\.[a-zA-Z_$]+ = new [a-zA-Z_$]+\([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+, [a-zA-Z_$]+\.[a-zA-Z_$]+\), [a-zA-Z_$]+\.[a-zA-Z_$]+\.[a-zA-Z_$]+\(\)/;
-        signatures.defaultChat      = /this(\.[a-zA-Z$_]+)\s*=\s*"all"/
-        signatures.chatlog          = /([a-zA-Z$_]+\.[a-zA-Z$_]+) = [a-zA-Z$_]+ [a-zA-Z$_]+\([a-zA-Z$_]+\.[a-zA-Z$_]+\(\)\.[a-zA-Z$_]+, [a-zA-Z$_]+\.[a-zA-Z$_]+\), [a-zA-Z$_]+\.[a-zA-Z$_]+\.[a-zA-Z$_]+\(\)/
+        signatures.cookieParser     = /return\s+[a-zA-Z_$]+\("ingress\.intelmap\."\s*\+\s*[a-zA-Z_$]+\)/;
+        signatures.mapConstructor   = /([a-zA-Z_$]+\.[a-zA-Z_$]+)\s*=\s*new\s+google\.maps\.Map\(document\.getElementById\("map_canvas"\)\,\s*[a-zA-Z_$]+\);/;
+        signatures.chatCreation     = /[a-zA-Z_$]+\.[a-zA-Z_$]+\s*=\s*new\s+[a-zA-Z_$]+\([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+,\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\),\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\.[a-zA-Z_$]+\(\)/;
+        //duplicate above except more paren... so shoudl replace.
+        signatures.chatlog          = /([a-zA-Z$_]+\.[a-zA-Z$_]+)\s*=\s*new\s+[a-zA-Z$_]+\([a-zA-Z$_]+\.[a-zA-Z$_]+\(\)\.[a-zA-Z$_]+,\s*[a-zA-Z$_]+\.[a-zA-Z$_]+\),\s*[a-zA-Z$_]+\.[a-zA-Z$_]+\.[a-zA-Z$_]+\(\)/;
+        signatures.defaultChat      = /this\.([a-zA-Z$_]+)\s*=\s*"all"/;
+        signatures.dashboardConst   = /([\s\S]+ZOOM_LEVEL\s*=\s*)([a-zA-Z_$]+)(;[\s\S]+new\s+google\.maps\.LatLng)(\([a-zA-Z_$]+,\s*[a-zA-Z_$]+\);)([\s\S]+)/g;
+        signatures.defaultMapLocation  = /[a-zA-Z_$]+\(MAP_PARAMS\).+/;
     var replacedFunctions = {};
     var userData = { userSettings: null
                    , storageVersion: null
                    , userViews: null };
-
-    var compatible; /*extension compatibility true or false*/
-
+    var transientData = { "userLocation": {"status": "pending",
+                                         "message": "Geolocation retrieval has not yet been attempted."},
+                          "initialized": false,
+                          "compatibility": "incompatible" };
 
     /* Responsible for storing and overriding the normal ingress initiating so we can do any customization we need first.
      * */
@@ -68,39 +72,51 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
         //Add event listeners
 		document.addEventListener("loadView", function(e) { loadView(e.detail) });
-		document.addEventListener("REQ-GET_VIEW", getCurrentView, false); //false makes events propogate up first.
-		document.addEventListener("IPP-UPDATE_USER_SETTINGS", function(e) { setUserSettings(e.detail) }, false); //false makes events propogate up first.
+		document.addEventListener("REQ-GET_VIEW", getCurrentView, false); //false makes events propagate up first.
+		document.addEventListener("IPP-UPDATE_USER_SETTINGS", function(e) { setUserSettings(e.detail) }, false); //false makes events propagate up first.
         document.addEventListener("IPP-UPDATE_USER_DATA", function(e){ setUserData(e.detail) }, false);
         document.addEventListener("IPP-INITIALIZED", function(e){
             userData = e.detail.userData;
-            compatible = (e.detail.compatibility.compatibility=="compatible");
+            transientData = e.detail.transientData;
+            //compatible = (e.detail.compatibility.compatibility=="compatible");
             console.log('DETECTED IPP-INITIALIZED EVENT');
-            if(typeof ingressInit !== null && initialized == false)
+            if(typeof ingressInit !== null && transientData.initialized == false)
             {
-                //Things that need the userData should be loaded at this time.
-                console.log('IPP initialized calling ingress init.');
-                if(compatible)
+                try
                 {
-                    console.log("Use known variable names");
-                    setUpKnownHooks();
+                    //Things that need the userData should be loaded at this time.
+                    console.log('IPP initialized calling ingress init.');
+                    if(transientData.compatibility == "compatible")
+                    {
+                        console.log("Use known variable names");
+                        setUpKnownHooks();
+                    }
+                    else
+                    {
+                        console.warn("Alternate hooking needed");
+                        identifyHooks();
+                    }
+                    transientData.initialized = true;
+    
+                    console.log(JSON.stringify(userData.userSettings, null, ' '));
+                    console.log(JSON.stringify(transientData, null, ' '));
+
+                    overrideDashboard();
                 }
-                else
+                catch(e)
                 {
-                    console.warn("Alternate hooking needed");
-                    identifyHooks();
+                    console.error("Problem during initialization : " + e.message);
                 }
-                //TODO: move to correct placement.
-                overrideDashboard();
-
-                initialized = true;
-                ingressInit();
-
+                finally
+                {
+                    //Make sure this gets called even if we totally mess up.
+                    ingressInit();
+                }
             } }, false);
 
         //Request user settings basically we should probably not go on until we wave them...
 
         //do any hooking needed.
-        //requestGeolocation?
         overwriteRedeemCode();
         //findDateFormatter();
 
@@ -119,46 +135,191 @@ if(!IPP.Injected){ IPP.Injected = {} };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
         hooks.valueFromCookie   = function(name){ return(Oe(name)) };
         hooks.dashboardConstructor = yf;
+    }
 
-        //Originally I wanted to do something like this, but i could nto figure out how to make this the right way.
-        /*
-         knownHooks.map       = function(){return Z.c().h};
-         knownHooks.setZoom   = function(){knownHooks.map().setZoom.apply(Z.c().h, arguments)};
-         knownHooks.panTo     = function(){knownHooks.map().panTo.apply(Z.c().h,arguments)};
-         knownHooks.getCenter = function(){knownHooks.map().getCenter.apply(Z.c().h, arguments)};
-         hooks = knownHooks;
-         */
+    function identifyHooks()
+    {
+        var scriptCode = "";
+        var geoFunc = findFunctionContaining(signatures.geocode);
+        var mapRef = findInFunction(geoFunc, signatures.map_in_geocode);
+        scriptCode += "IPP.Injected.hooks.getMap = function(){return ("+mapRef+"); };";
+        var cookieFunc = findFunctionContaining(signatures.cookieParser);
+        scriptCode += "\nIPP.Injected.hooks.valueFromCookie = function(name){return ("+cookieFunc+"(name)); };";
+        var dashConst = findFunctionContaining(signatures.mapConstructor);
+        scriptCode += "\nIPP.Injected.hooks.dashboardConstructor = "+dashConst+";";
+
+        var script = document.createElement('script');
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("async", true);
+        script.appendChild(document.createTextNode(scriptCode));
+        head.appendChild(script);
+
+        //For the moment we are going to assume that since there are google Maps api calls, they will keep their names.
+        hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
+        hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
+        hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
+        hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
+
+    }
+
+    /*so would return null if the view doesnt exist.*/
+    function getDefaultView()
+    {
+        console.log('Checking for a default View');
+        var retVal = null;
+        for(var v in userData.userViews)
+        {
+            if(userData.userViews[v].guid == userData.userSettings.auto_load_view)
+            {
+                retVal = userData.userViews[v];
+                console.log('Default View found');
+            }
+        }
+        if(!retVal)
+        {
+            console.info("User requested a default load of a view, but did not specify a view");
+        }
+        return(retVal);
     }
 
     function overrideDashboard()
     {
+        //At this point, we should have identified hoooks.
+
         //IF we recognize it
-        if(compatible)
+        if(transientData.compatibility == "compatible")
         {
-            var targetLine = /a\.ka\s*=\s*new nf\(T\.c\(\).r,\s*a\.h\),\s*a\.ka\.u\(\)/g;
-            var myLine = "\na.ka.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
-                "\nvar c = document.getElementById(\"pl_tab_all\"), d = document.getElementById(\"pl_tab_fac\");" +
-                "\na.ka.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";
-            //replaceInFunction("bf",targetLine,targetLine+myLine)
-            appendInFunction("yf",targetLine,myLine);
+            if(userData.userSettings.comm_default_chat_tab != "all")
+            {
+                var commConst = findFunctionContaining2(signatures.defaultChat); //Re
+                var ChatModeVar = commConst.funcPointer.toString().match(signatures.defaultChat)[1]; //k
+                var commVar = hooks.dashboardConstructor.toString().match(RegExp('([a-zA-Z$_]+\\.[a-zA-Z$_]+)\\s*=\\s*new\\s+' + commConst.name +'.+')); //a.la is 1     //TODO: get bf someother way
+
+                var newLine = ';' + commVar[1] + '.' + ChatModeVar + '="' + userData.userSettings.comm_default_chat_tab + '";'; //do the override
+                //visually fix
+                    newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
+
+                replaceInFunction("yf",commVar[0],commVar[0]+newLine);
+            }
+
+
+/*
+            var targetLine, myLine;
+            //Set up default chat
+            if(userData.userSettings.comm_default_chat_tab != "all")
+            {
+                targetLine = "a.la = new Re(T.c().r, a.h), a.la.v()";
+                myLine = "\na.la.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
+                    "\nvar c = document.getElementById(\"pl_tab_all\"), d = document.getElementById(\"pl_tab_fac\");" +
+                    "\na.la.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";
+                replaceInFunction("bf",targetLine,targetLine+myLine);
+            }
+*/
+
+            //Set up default loads. basically if we are not set to default on one of them
+            if(userData.userSettings.auto_load_fresh != "world" || userData.userSettings.auto_load_page != "last")
+            {
+                var defaultView = getDefaultView();
+                //find alternate method for Oe - hooks.valueFromCookie
+                var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
+                var matches = signatures.dashboardConst.exec(hooks.dashboardConstructor.toString());
+                //  matches[0] - whole thing
+                //  matches[1] - before zoom
+                //  matches[2] - zoomLevel variable
+                //  matches[3] - after zoom var
+                //  matches[4] - parameters sent to google map LatLng
+                //  matches[5] - after point creation.
+                var replaceZoom, replaceLatLng;
+
+                //override any map points
+                if(transientData.userLocation.status == "known" && ((state == "fresh" && userData.userSettings.auto_load_fresh == "geo") || (state == "newPage" && userData.userSettings.auto_load_page == "geo")))
+                {
+                    console.info('Using geolocation for map');
+                    replaceZoom = userData.userSettings.auto_load_geo_zoom + ";";
+                    replaceLatLng = "(" + transientData.userLocation.latitude + "," + transientData.userLocation.longitude + ");"
+                }
+                else if(defaultView != null && ((state == "fresh" && userData.userSettings.auto_load_fresh == "saved") || (state == "newPage" && userData.userSettings.auto_load_page == "saved")))
+                {
+                    console.info('Using saved view for map');
+                    replaceZoom = defaultView.zoomLevel + ";";
+                    replaceLatLng = "(" + defaultView.latitude + "," + defaultView.longitude + ");";
+                }
+                if(typeof replaceZoom !== "undefined" && typeof replaceLatLng !== "undefined")
+                {
+                    matches[2] = matches[2] + ' = ' + replaceZoom;
+                    matches[4] = replaceLatLng;
+                }
+
+                matches.shift(); //Remove the original function.
+                //In the end we just add a script with the new function definition... no assignment or anything needed, beyond backing up.
+                addScript(matches.join('')); //need empty string otherwise it adds ,
+
+                if(totallyConverted())
+                {
+                    console.log('Total conversion making things interesting.');
+                    if(transientData.userLocation.status == "known" && ((state == "fresh" && userData.userSettings.auto_load_fresh == "geo") || (state == "newPage" && userData.userSettings.auto_load_page == "geo")))
+                    {
+                        console.info('Using geolocation for map');
+                        map.setView([transientData.userLocation.latitude, transientData.userLocation.longitude], userData.userSettings.auto_load_geo_zoom);
+                    }
+                    else if(defaultView != null && ((state == "fresh" && userData.userSettings.auto_load_fresh == "saved") || (state == "newPage" && userData.userSettings.auto_load_page == "saved")))
+                    {
+                        console.info('Using saved view for map');
+                        map.setView([defaultView.latitude, defaultView.longitude], defaultView.zoomLevel);
+                    }
+                }
+
+            }
+            else
+            {
+                console.info('Using ingress defaults for map autoload location.');
+            }
         }
         else
         {
+            var constFunc;
+            var chatLogFaction;
+            var chatConst;
+            var theDefVar;
+            var myLine;
+            var dbConst;
+            if(userData.userSettings.comm_default_chat_tab != "all")
+            {
+                constFunc = findFunctionContaining2(signatures.mapConstructor); // returns bf function
+                chatLogFaction = findInFunction(constFunc.funcPointer,signatures.chatlog); //returns a.la
 
-            //TODO: finish this... at the moment it only adds an alert...
-            var constFunc = findFunctionContaining2(signatures.mapConstructor); // returns bf function
-            var chatLogFaction = findInFunction(constFunc.funcPointer,signatures.chatlog); //returns a.la
+                //find k... the default chat.
+                chatConst = findFunctionContaining2(signatures.defaultChat); //Re
+                theDefVar = findInFunction(chatConst.funcPointer,signatures.defaultChat) // .k
 
-            //find k... the default chat.
-            var chatConst = findFunctionContaining2(signatures.defaultChat); //Re
-            var theDefVar = findInFunction(chatConst.funcPointer,signatures.defaultChat) // .k
+                myLine = "\n " + chatLogFaction + theDefVar + " = IPP.Injected.getUserSettings().comm_default_chat_tab;"
+                   + "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
 
-            var myLine = "\n " + chatLogFaction + theDefVar + " = IPP.Injected.getUserSettings().comm_default_chat_tab;"
-               + "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
+                dbConst = findFunctionContaining2(signatures.mapConstructor);
+                appendInFunction(dbConst.name, signatures.chatCreation, myLine)
+            }
 
-            var dbConst = findFunctionContaining2(signatures.mapConstructor);
-            appendInFunction(dbConst.name, signatures.chatCreation, myLine)
+            console.log('Currently default view loading does not work when dashbaord is not known.');
+
+            //Set up default loads. basically if we are not set to default on one of them
+            //TODO: add support for this with dynamic
+            /*if(userData.userSettings.auto_load_fresh != "world" || userData.userSettings.auto_load_page != "last")
+            {
+                constFunc = findFunctionContaining2(signatures.mapConstructor); // returns bf function
+                myLine = "";
+                replaceInFunction(constFunc.name,signatures.defaultMapLocation,myLine);
+            }*/
         }
+    }
+
+
+    function addScript(scriptCode)
+    {
+        var script = document.createElement('script');
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("async", true);
+        script.appendChild(document.createTextNode(scriptCode));
+        head.appendChild(script);
     }
 
     /*Used to visually swap the classes on a pair of elements. if the class is not there to begin with, it does not swap.*/
@@ -248,30 +409,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         return(aFunction.toString().match(someRegex)[1]);
     }
 
-    function identifyHooks()
-    {
-        var scriptCode = "";
-        var geoFunc = findFunctionContaining(signatures.geocode);
-        var mapRef = findInFunction(geoFunc, signatures.map_in_geocode);
-            scriptCode += "IPP.Injected.hooks.getMap = function(){return ("+mapRef+"); };";
-        var cookieFunc = findFunctionContaining(signatures.cookieParser);
-            scriptCode += "\nIPP.Injected.hooks.valueFromCookie = function(name){return ("+cookieFunc+"(name)); };";
-        var dashConst = findFunctionContaining(signatures.mapConstructor);
-            scriptCode += "\nIPP.Injected.hooks.dashboardConstructor = "+dashConst+";";
 
-        var script = document.createElement('script');
-            script.setAttribute("type", "text/javascript");
-            script.setAttribute("async", true);
-            script.appendChild(document.createTextNode(scriptCode));
-            head.appendChild(script);
-
-        //For the moment we are going to assume that since there are google Maps api calls, they will keep their names.
-        hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
-        hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
-        hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
-        hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-
-    }
 
     function setUserData(userDataObject)
     {
@@ -367,15 +505,6 @@ if(!IPP.Injected){ IPP.Injected = {} };
             map.setView([view.latitude, view.longitude], view.zoomLevel);
         }
 
-        getViewJSON = function()
-        {
-            var cv = map.getCenter();
-            var currentView = '{"zoomLevel": ' + map.getZoom() + ',' +
-                '"latitude": '  + cv.lat + ',' +
-                '"longitude": ' + cv.lng + "}";
-            return currentView;
-        }
-
         //Notify the user wel
         //Ask content script for init.
         var event = new CustomEvent("TOTAL-CONV-DETECT", {"detail": "detected" });
@@ -390,17 +519,35 @@ if(!IPP.Injected){ IPP.Injected = {} };
 	*/
 	function getViewJSON()
 	{
-		//create some JSON.
-		//https://developers.google.com/maps/documentation/javascript/reference#Map
+        if(totallyConverted())
+        {
+            getViewJSON = function()
+            {
+                var cv = map.getCenter();
+                var currentView = '{"zoomLevel": ' + map.getZoom() + ',' +
+                    '"latitude": '  + cv.lat + ',' +
+                    '"longitude": ' + cv.lng + "}";
+                return currentView;
+            }
+        }
+        else
+        {
+            //create some JSON.
+            //https://developers.google.com/maps/documentation/javascript/reference#Map
 
-        //NOTE: an alternate method is document.querySelector('[title="Report errors in the road map or imagery to Google"]').href which should be less succeptable to code?
-        //'http://www.ingress.com/intel?' + document.querySelector('[title="Report errors in the road map or imagery to Google"]').href.split('?')[1].split('&t')[0].replace(/\./g,'').replace('ll','latE6').replace(',', '&lngE6=')
-		var cv = hooks.getCenter();
-		console.log(cv.Ya + ' ' + cv.Za + '    ' + hooks.getZoom());
-		var currentView = '{"zoomLevel": ' + hooks.valueFromCookie("zoom") + ',' +
-						   '"latitude": '  + hooks.valueFromCookie("lat") + ',' +
-						   '"longitude": ' + hooks.valueFromCookie("lng") + "}";
-		return currentView;
+            //NOTE: an alternate method is document.querySelector('[title="Report errors in the road map or imagery to Google"]').href which should be less susceptible to code?
+            //'https://www.ingress.com/intel?' + document.querySelector('[title="Report errors in the road map or imagery to Google"]').href.split('?')[1].split('&t')[0].replace(/\./g,'').replace('ll','latE6').replace(',', '&lngE6=')
+            //var cv = hooks.getCenter();
+            //console.log(hooks.valueFromCookie("lat") + ' ' + hooks.valueFromCookie("lng") + ' ' + hooks.getZoom());
+            getViewJSON = function()
+            {
+                var currentView = '{"zoomLevel": ' + hooks.valueFromCookie("zoom") + ',' +
+                    '"latitude": '  + hooks.valueFromCookie("lat") + ',' +
+                    '"longitude": ' + hooks.valueFromCookie("lng") + "}";
+                return currentView;
+            }
+        }
+        return getViewJSON();
 	}
 
 	function overwriteRedeemCode()
@@ -433,6 +580,21 @@ if(!IPP.Injected){ IPP.Injected = {} };
 		}
     }
 
+    /**
+     * Determines if an object has any properties.
+     * If it does not, the gor in will not run, and we will return true.
+     * @param someObject the object that should be tested for properties
+     * @return {Boolean}
+     */
+    function hasProperties(someObject)
+    {
+        for(var key in someObject)
+        {
+            return false;
+        }
+        return true;
+    }
+
 	/**
 	*	@name: getCurrentView
 	*	@description: - This is a wrapper for getViewJSON. It is called by, and mostly used in order to communicate back to contentScript.js through events
@@ -461,6 +623,8 @@ if(!IPP.Injected){ IPP.Injected = {} };
 	ns.getUserSettings = getUserSettings;
     ns.getUserData = getUserData;
     ns.swapClass = swapClass;
+    ns.getDefaultView = getDefaultView;
+    ns.findFunctionContaining2 = findFunctionContaining2;
     ns.hooks = hooks;
 })();
 IPP.Injected.init();

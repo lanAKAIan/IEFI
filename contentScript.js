@@ -20,13 +20,13 @@
 /** contentScript.js
  */
 
-var userSettings = {};
-
 var userData = { userSettings: null
                 , storageVersion: null
                 , userViews: null };
-
-var compatibility = null;
+var transientData = { "userLocation": { "status": "pending",
+                                        "message": "Geolocation retrieval has not yet been attempted."},
+                      "initialized": false,
+                      "compatibility": "incompatible" };
 
 /**
  * checks to see if we are logged into the intel site. That way we don't get undefined errors.
@@ -53,6 +53,34 @@ function loggedIn() {
     }
 }
 
+function getDashboardURI()
+{
+    var retVal = null;
+    try
+    {
+        var matches = document.querySelectorAll('script[src*=gen_dashboard]');
+        if(matches.length==1)
+        {
+            retVal = matches[0].src;
+
+        }
+    }
+    catch(e)
+    {
+        console.error('Problem detecting the dashboard script version: ' + e.message);
+    }
+    finally
+    {
+        if(retVal == null)
+        {
+            console.error('Using generic dashboard location');
+            retVal = "https://www.ingress.com/intel/jsc/gen_dashboard.js";
+        }
+        console.info('Using dashboard url:' + retVal);
+    }
+    return(retVal);
+}
+
 /**
  * This section deals with actually injecting the injectScript.js into the ingress page. We are not checking the url on the assumption the manifest will
  * at release only fire for ingress pages. Anyway the reason we have an injectScript.js file at all is because contentScript can not access the pages window variables
@@ -64,8 +92,6 @@ var script = document.createElement('script');
     script.setAttribute("async", true);
     script.setAttribute("src", chrome.extension.getURL("injectScript.js"));
     head.insertBefore(script, head.firstChild);
-
-
 
 /**
  * This section sets up the message listeners in the content script for messages from the background.js page.
@@ -150,13 +176,20 @@ chrome.extension.onMessage.addListener(
             sendResponse({farewell:"USERDATA Initialize SENT TO CLIENT"});*/
         }
         else if (request.request == "NOTIFY_INIT_DATA") {
-            console.log('Content Script received initialization data');
+            console.log('Content Script received initialization data from background');
             userData = request.userData;
-            compatibility = request.compatibility;
-            var initData = {"userData": userData, "compatibility": compatibility};
-            // create and dispatch the event
-            var event = new CustomEvent("IPP-INITIALIZED", {"detail": initData });
-            document.dispatchEvent(event);
+            transientData.compatibility = request.compatibility;
+
+            var initInjected = function()
+            {
+                var initData = {"userData": userData,
+                    "transientData": transientData};
+                // create and dispatch the event
+                var event = new CustomEvent("IPP-INITIALIZED", {"detail": initData });
+                document.dispatchEvent(event);
+            }
+            requestUserLocation(initInjected);
+
             sendResponse({farewell:"USERDATA Initialize SENT TO CLIENT"});
         }
     });
@@ -168,7 +201,7 @@ document.addEventListener("INITIALIZE", handleInjectInitRequest, false);
 function handleInjectInitRequest()
 {
     //We should request the compatibility... and the userdata etc.
-    chrome.extension.sendMessage({message:"NEW-INITIALIZE-EVENT"}, function (response) {
+    chrome.extension.sendMessage({message:"NEW-INITIALIZE-EVENT", dashboardURI: getDashboardURI()}, function (response) {
         console.log('Content Script got a notification to initialize.');
     });
 }
@@ -184,10 +217,6 @@ function notifyTotalConversion()
         console.log('Content Script got a notification that it was in totalConversion.');
     });
 }
-
-
-
-
 
 var screenshotStyle;
 function hidePII(hide, callback) {
@@ -234,8 +263,12 @@ function hidePII(hide, callback) {
                 screenshotCSS += "#header_links,#header_links_title,";
             }
             if (userData.userSettings.screenshot_visibility_mu == "hide") {
-                locus = "hiding mind units";
+                locus = "hiding zoom level";
                 screenshotCSS += "#game_stats,";
+            }
+            if (userData.userSettings.screenshot_visibility_zoom == "hide") {
+                locus = "hiding mind units";
+                screenshotCSS += "#zoom_level_data,";
             }
             if (userData.userSettings.screenshot_visibility_nickname == "hide") {
                 locus = "hiding player nickname";
@@ -263,7 +296,7 @@ function hidePII(hide, callback) {
              /*if(userData.userSettings.screenshot_visibility_link == "show")
              {
              locus = "add direct link";
-             //var link = 'http://www.ingress.com/intel?\' + document.querySelector(\'[title="Report errors in the road map or imagery to Google"]\').href.split(\'?\')[1].split(\'&t\')[0].replace(/\./g,\'\').replace(\'ll\',\'latE6\').replace(\',\', \'&lngE6=\')'
+             //var link = 'https://www.ingress.com/intel?\' + document.querySelector(\'[title="Report errors in the road map or imagery to Google"]\').href.split(\'?\')[1].split(\'&t\')[0].replace(/\./g,\'\').replace(\'ll\',\'latE6\').replace(\',\', \'&lngE6=\')'
              var link = 'document.domain';
                  screenshotCSS+="\n #nav:after { display: inline-block; position: relative; right: 0; height: 40px; padding-left: 4px; top: 4px; font-size: 15px; text-transform: none; content: '"+link+"'; }";
              }
@@ -291,6 +324,70 @@ function hidePII(hide, callback) {
     }
 }
 
+/**
+ * Geolocation check now in here... so malicios scripts cant call... though in the end we use it...
+ * @param callback
+ */
+function requestUserLocation(callback){
+    if(userData.userSettings.auto_load_page != "geo" && userData.userSettings.auto_load_fresh != "geo")
+    {
+        console.log("Current user settings have no need for geolocation.");
+        transientData.userLocation = {"status": "auto-denied", "message": "Current extension settings do not require this information." };
+        if(typeof callback !== "undefined")
+        {
+            callback(transientData.userLocation);
+        }
+    }
+    else
+    {
+        console.log('Requesting the user Location');
+        transientData.userLocation = {"status": "pending", "message": "Geolocation retrieval has not yet been attempted."};
+
+        var opts = {enableHighAccuracy: false, timeout: 3000, maximumAge: 5000}; //timeout appears to not include waiting on user to decide on permission.
+        var handleGeolocation = function(position) {
+            transientData.userLocation = { "latitude": position.coords.latitude,
+                "longitude": position.coords.longitude,
+                "status": "known" };
+            console.log('User Location: ' + JSON.stringify(transientData.userLocation));
+            if(typeof callback !== "undefined")
+            {
+                callback(transientData.userLocation);
+            }
+        }
+        var handleGeoError = function(positionError)
+        {
+            if (positionError.code == 0) {
+                // unknown error
+                transientData.userLocation = {"status": "unknown", "message": "An unknown error occurred retrieving your location." };
+            }
+            else if (positionError.code == 1) {
+                // access is denied
+                transientData.userLocation = {"status": "denied", "message": "Permission request to retrieve geolocation was denied." };
+            }
+            else if (positionError.code == 2) {
+                // position unavailable
+                transientData.userLocation = {"status": "unavailable", "message": "Geolocation is currently unavailable." };
+            }
+            else if (positionError.code == 3) {
+                // timeout
+                transientData.userLocation = {"status": "timeout", "message": "Geolocation could not be determined within the required time." };
+            }
+            console.error("requestUserLocation: " + transientData.userLocation.message);
+            if(typeof callback !== "undefined")
+            {
+                callback(transientData.userLocation);
+            }
+        }
+        navigator.geolocation.getCurrentPosition(handleGeolocation, handleGeoError, opts);
+    }
+}
+
+/*Attempts to determine if ingress total conversion is all up in the page.*/
+function totallyConverted()
+{
+    return (document.querySelector('[src*=total-conversion]') ? true : false);
+}
+
 //This sections is to handle when we want to display the pageAction icon
 function handleVisibilityChange() {
     if (!document.webkitHidden) {
@@ -309,12 +406,6 @@ function handleVisibilityChange() {
             document.dispatchEvent(event);
         });
     }
-}
-
-/*Attempts to determine if ingress total conversion is all up in the page.*/
-function totallyConverted()
-{
-    return (document.querySelector('[src*=total-conversion]') ? true : false);
 }
 
 //We should probably make sure this is only added once, but since this is a content script it should be true.

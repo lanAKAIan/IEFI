@@ -24,7 +24,7 @@
  * */
 
 /**
- * Flag for testing. When true, we will allways use the alternate method of hooking in functionality.
+ * Flag for testing. When true, we will always use the alternate method of hooking in functionality.
  * @type {Boolean}
  */
 var forceIncompatibile = false;
@@ -44,36 +44,41 @@ function parseVersion(versionString)
                 "build": v[3] ? parseInt(v[3], 10) : 0 };
         out.versionString =( "" + out.major + "." + out.minor + "." + out.patch + "." + out.build);
 
-    console.log(out.versionString);
+    //console.log(out.versionString);
     return(out);
 }
 
 var eVersionInfo = parseVersion(chrome.app.getDetails().version);
 
-//NOTE: assumes that the current version is compatable with the latest in the list.
+//NOTE: assumes that the current version is compatible with the latest in the list.
 //The key is the SHA1 of the dashboard version.
 
 /**
- *
+ * NOTE: assumes that the current version is compatible with the latest in the list. The key is the SHA1 of the dashboard version.
  * @type {Object}
  */
 var dashboardHashes = { "759f4a6f0401791573bbe2720240b9cb31e7bf72": { "knownCompatableVersions": [ "1.0.1.0" ] },
                         "4d1b4cfe7eb11ae7434444c4dadc0172cd9d1b1a": { "knownCompatableVersions": [ "1.0.2.0",
-                                                                                                   "1.1.0.3" ],
+                                                                                                   "1.1.0.3",
+                                                                                                   "1.2.0.6"],
                                                                       "length": 26546 },
-                        "7c782a69b1f59dc1afeaa56bf2f5e67106c62163": { "knownCompatableVersions": [ "1.2.1.0", "1.2.2.0"], "length": 23839 },
-                        "8d180a277784ac2032968fed2bdb33c535f8d804": { "knownCompatableVersions": [ "1.2.3.0", parseVersion(chrome.app.getDetails().version).versionString], "length": 27341 }
+                        "7c782a69b1f59dc1afeaa56bf2f5e67106c62163": { "knownCompatableVersions": [ "1.2.1.0", "1.2.2.0" ] ,
+                                                                      "length": 23839 },
+                        "8d180a277784ac2032968fed2bdb33c535f8d804": { "knownCompatableVersions": [ "1.2.3.0", eVersionInfo.versionString], "length": 27341 }
 };
 
+//OK so we really need to centralize all this... and put it in one place.
+//TODO: we should just go by version and not by hash. as our primary key that is.
 
 /**
  * Sends an AJAX request to the server and retrieves the un-adulterated gen_dashboard.js. This is then processed to get the length and sha1 value of its contents.
  * @param {function=} callback an optional callback function that will be passed the response
  */
-function getDashboardVersion(callback)
+function getDashboardVersion(callback, dashboardURI)
 {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://www.ingress.com/jsc/gen_dashboard.js", true);
+    //TODO: determine this off the actual source, not what we assume.
+    xhr.open("GET", dashboardURI, true);
     xhr.timeout = 3000;
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
@@ -121,8 +126,9 @@ function generateSHA1(file) {
  * @param {function} callback function to be passed the compatibility object.
  * @param {object=} opt_CompatibilityReturn object that will be set to the compatibility as detected.
  */
-function checkCompatibility(callback, opt_CompatibilityReturn)
+function checkCompatibility(callback, opt_CompatibilityReturn, dashboardURI)
 {
+    console.info('Checking dashboard compatibility with extension version ' + eVersionInfo.versionString);
     if(forceIncompatibile)
     {
         console.warn("Force Incompatible setting is on, function will all ways return \"unknown\" compatibility.");
@@ -172,5 +178,5 @@ function checkCompatibility(callback, opt_CompatibilityReturn)
             opt_CompatibilityReturn = retVal;
         }
     }
-    getDashboardVersion(haveDB);
+    getDashboardVersion(haveDB, dashboardURI);
 }
