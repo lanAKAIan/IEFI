@@ -30,13 +30,13 @@ if(!IPP.Injected){ IPP.Injected = {} };
     //"somestringToRegex".replace(/(\(|\)|\.|\\)/g, '\\$1').replace(/([a-zA-Z$_]+)/g, '[a-zA-Z$_]+');
 	var signatures = {};
 		signatures.nativeFunction   = /\{ \[native code\] \}/;
-		signatures.redeem           = /var a=document\.getElementById\("passcode"\),b=a\.value;/;
+        signatures.redeem           = /var a\s*=\s*document\.getElementById\("passcode"\),\s*b =\s*a\.value;/; //Can have or not have spaces.
         signatures.geocode          = /document\.getElementById\("address"\)/;
         signatures.map_in_geocode   = /([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+)\.fitBounds\([a-zA-Z_$]+\)/;
         signatures.cookieParser     = /return [a-zA-Z_$]+\("ingress\.intelmap\." \+ [a-zA-Z_$]+\)/;
         signatures.mapConstructor   = /([a-zA-Z_$]+\.[a-zA-Z_$]+) = new google\.maps\.Map\(document\.getElementById\("map_canvas"\)\, [a-zA-Z_$]+\);/;
         signatures.chatCreation     = /[a-zA-Z_$]+\.[a-zA-Z_$]+ = new [a-zA-Z_$]+\([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+, [a-zA-Z_$]+\.[a-zA-Z_$]+\), [a-zA-Z_$]+\.[a-zA-Z_$]+\.[a-zA-Z_$]+\(\)/;
-        signatures.defaultChat      = /this(\.[a-zA-Z$_]+) = "all"/
+        signatures.defaultChat      = /this(\.[a-zA-Z$_]+)\s*=\s*"all"/
         signatures.chatlog          = /([a-zA-Z$_]+\.[a-zA-Z$_]+) = [a-zA-Z$_]+ [a-zA-Z$_]+\([a-zA-Z$_]+\.[a-zA-Z$_]+\(\)\.[a-zA-Z$_]+, [a-zA-Z$_]+\.[a-zA-Z$_]+\), [a-zA-Z$_]+\.[a-zA-Z$_]+\.[a-zA-Z$_]+\(\)/
     var replacedFunctions = {};
     var userData = { userSettings: null
@@ -135,11 +135,12 @@ if(!IPP.Injected){ IPP.Injected = {} };
         //IF we recognize it
         if(compatible)
         {
-            var targetLine = "a.la=new Re(T.c().r,a.h),a.la.v()";
+            var targetLine = /a\.la\s*=\s*new Re\(T\.c\(\).r,\s*a\.h\),\s*a\.la\.v\(\)/g;
             var myLine = "\na.la.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
                 "\nvar c = document.getElementById(\"pl_tab_all\"), d = document.getElementById(\"pl_tab_fac\");" +
                 "\na.la.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";
-            replaceInFunction("bf",targetLine,targetLine+myLine)
+            //replaceInFunction("bf",targetLine,targetLine+myLine)
+            appendInFunction("bf",targetLine,myLine);
         }
         else
         {
