@@ -2,7 +2,13 @@
 {
     color:#EBBC4A;
     background-color:#262626;
-    white-space: nowrap
+    white-space: nowrap;
+    font-family: coda_regular, arial, helvetica, sans-serif;
+}
+
+@font-face {
+    font-family: coda_regular;
+    src: url('lib/Coda/coda_regular.ttf');
 }
 
 img
@@ -24,9 +30,8 @@ img
     -webkit-box-flex: 0;
 }
 
-#directLinks
+#windowFieldSet
 {
-
     display: inline-block;
     border: 1px solid #EBBC4A;
     min-width: 500px;
@@ -34,13 +39,6 @@ img
     margin-left: 10px;
     margin-top: 4px;
     margin-bottom: 4px;
-
-}
-
-legend
-{
-    padding-left: 0px;
-    background-color: transparent;
 }
 
 #windowName
@@ -49,6 +47,7 @@ legend
     border: 1px solid #EBBC4A;
     padding-left: 3px;
     padding-right: 3px;
+    background-color: transparent;
 }
 
 input {
@@ -58,18 +57,16 @@ input {
     border-color:#EBBC4A;
 }
 
-.link_label
+#performSaveButton
 {
-    min-width: 110px;
+    margin-left: 5px;
 }
 
-#closeButton
+.link_label
 {
-    height: 36px;
-    width: 36px;
-    margin-left: -4px;
-    margin-top: -2px
+    min-width: 130px;
 }
+
 #closeDiv
 {
     display: inline-block;
@@ -81,4 +78,18 @@ input {
     width: 30px;
     height: 30px;
     overflow: hidden;
+}
+#closeButton
+{
+    height: 36px;
+    width: 36px;
+    margin-left: -4px;
+    margin-top: -2px
+}
+
+#notifyStatus
+{
+    width: 100%;
+    display: none;
+    text-align:center;
 }

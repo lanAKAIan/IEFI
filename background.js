@@ -1,21 +1,21 @@
-/*
-Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
-Copyright (C) 2013  Ian Scott Friedman
+/* @license
+ Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
+ Copyright (C) 2013  Ian Scott Friedman
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 
 /**
@@ -205,7 +205,7 @@ function generateTOAST(image, message, body)
 }
 
 //https://maps.google.com/?q=TheLatitudeOfTarget+TheLongetudeOfTarget+(TheNameOfThePlaceMarker)
-var GoogleMapsBaseUrl = 'https://maps.google.com/?q=';
+var GoogleMapsBaseUrl = 'https://maps.google.com/?';
 function generateGoogleMapsLink(view, callback)
 {
 	var viewObj ;
@@ -217,7 +217,8 @@ function generateGoogleMapsLink(view, callback)
 	{
 		console.error('Unable to parse view for google maps link');
 	}
-	var link = GoogleMapsBaseUrl + '+' + viewObj.latitude+ '+' + viewObj.longitude + '&z=' + viewObj.zoomLevel;
+    //usig ll instead of q makes it so we dont mark a place on the map.
+	var link = GoogleMapsBaseUrl + 'll=' + viewObj.latitude+ ',' + viewObj.longitude + '&z=' + viewObj.zoomLevel;
 	//generateTOAST('icon-48.png','Google Maps Link', link + '<button>hello</button>');
 	callback(link);
 }
@@ -241,6 +242,40 @@ function notifyUserOfUpdate()
 function displayChangelog()
 {
     chrome.tabs.create({ url: "http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog"});
+}
+
+
+function notifyUserOfTotalConversion()
+{
+        var title = "Ingress Total Conversion Detected";
+        var msg   = "Only basic functionality will be available. (screenshot, load/save views)";
+        var img   = "res/icon-48.png";
+        var notify = generateTOAST(img,title, msg);
+        notify.addEventListener( 'click', function(){notify.cancel()});
+        var closein10 = function()
+        {
+            setTimeout(function(){notify.cancel()}, 10000);
+        }
+        notify.addEventListener( 'show', closein10);
+        notify.show();
+}
+
+function notifyUserOfCompatibility(compat)
+{
+    if(compat.compatibility != "compatible")
+    {
+        var title = "Unknown Dashboard Version Detected";
+        var msg   = "Some functionality may not work until extension is updated. Click here to learn more.";
+        var img   = "res/icon-48.png";
+        var notify = generateTOAST(img,title, msg);
+        notify.addEventListener( 'click', function(){displayUnknownDashboardVersion();notify.cancel()});
+        notify.show();
+    }
+}
+
+function displayUnknownDashboardVersion()
+{
+    chrome.tabs.create({ url: "http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/UnknownDashboardVersion"});
 }
 
 //Zoom16 is the least you can zoom and still see lvl 0 portals.
@@ -427,7 +462,7 @@ chrome.extension.onMessage.addListener(
 	{
 		sendResponse({farewell: "goodbye"}); //close the connection.
 		
-			//console.log('detected page load');
+			console.log('detected page load');
 			if(request.userLoggedIn == true)
 			{
 				//Show regularPageAction
@@ -463,7 +498,29 @@ chrome.extension.onMessage.addListener(
         chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_ALL_USER_DATA", "userData": IPP.StorageManager.getAllData()}, function(response) {
             console.info('Tab got the message with all the userdata');	});*/
     }
+    else if (request.message == "NEW-INITIALIZE-EVENT")
+    {
+        sendResponse({farewell: "goodbye"}); //close the connection.
+
+        var compatFunc = function(compatibility)
+        {
+            notifyUserOfCompatibility(compatibility)
+            chrome.tabs.sendMessage(sender.tab.id, {request: "NOTIFY_INIT_DATA", "userData": IPP.StorageManager.getAllData(), "compatibility": compatibility}, function(response) {
+                console.info('Tab CS got the message with all the initialization data');	});
+        }
+
+        //A new page load, so we want to check compatibility.
+        checkCompatibility(compatFunc, extensionCompatibility);
+    }
+    else if (request.message == "TOTAL-CONVERSION-DETECTED")
+    {
+        sendResponse({farewell: "goodbye"}); //close the connection.
+
+        notifyUserOfTotalConversion();
+    }
   });
+
+var extensionCompatibility = null;
   
 //////////////////
 function updateUserSettings(updatedUserSettings)

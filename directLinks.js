@@ -1,4 +1,4 @@
-/*
+/* @license
  Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
  Copyright (C) 2013  Ian Scott Friedman
 
@@ -43,7 +43,8 @@ function copyIntelToClipboard()
     linput.select();
     document.execCommand("Copy");
     document.getSelection().removeAllRanges();
-    document.getElementById('linkCopyStatus').innerText = "Link copied to clipboard.";
+    document.getElementById('notifyStatus').innerText = "Link copied to clipboard.";
+    document.getElementById('notifyStatus').style.display = "block";
 }
 
 function copyMapsToClipboard()
@@ -53,7 +54,8 @@ function copyMapsToClipboard()
     linput.select();
     document.execCommand("Copy");
     document.getSelection().removeAllRanges();
-    document.getElementById('linkCopyStatus').innerText = "Link copied to clipboard.";
+    document.getElementById('notifyStatus').innerText = "Link copied to clipboard.";
+    document.getElementById('notifyStatus').style.display = "block";
 }
 
 function setIntelLink(link)

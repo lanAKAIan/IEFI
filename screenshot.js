@@ -1,4 +1,4 @@
-/*
+/* @license
  Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
  Copyright (C) 2013  Ian Scott Friedman
 

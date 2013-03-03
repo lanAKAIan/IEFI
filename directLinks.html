@@ -2,11 +2,11 @@
 <html>
 <head>
     <title>Intelligence Enhancer for Ingress - Direct Links</title>
-    <LINK href="directLinks.css" rel="stylesheet" type="text/css">
+    <LINK href="combo.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="directLinks.js"></script>
 </head>
 <body>
-        <fieldset id="directLinks">
+        <fieldset id="windowFieldSet">
             <legend id="windowName">Direct Links</legend>
             <div id="directLinkIntel" class="horizontalFlex">
                 <img src="res/Ingress_logo_512px con link.png">
@@ -20,9 +20,7 @@
                 <div class="box1"><input id="input_gmapsDirectLink" class="directLink" readonly="readonly" placeholder="calculating..."/></div>
                 <div class="box0"><button id="copy_gmapsDirectLink" />Copy</button></div>
             </div>
-            <div class="horizontalFlex">
-                <div class="box1" id="linkCopyStatus"></div>
-            </div>
+            <div id="notifyStatus"></div>
         </fieldset>
         <div id="closeDiv"><img id="closeButton" src="res/ic_menu_close_clear_cancel.png" title="Close"></div>
 </body>

@@ -1,4 +1,4 @@
-/*
+/* @license
  Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
  Copyright (C) 2013  Ian Scott Friedman
 
@@ -46,7 +46,7 @@ function saveCurrentView()
 
     // we need to prompt them for a view name.
     var viewName = document.getElementById('input_saveViewName').value;
-    var status = document.getElementById('saveStatus');
+    var status = document.getElementById('notifyStatus');
 
     if(typeof viewName == "undefined" || viewName.length == 0)
     {
@@ -69,7 +69,7 @@ function saveCurrentView()
 
 function clearStatus()
 {
-    var status = document.getElementById('saveStatus');
+    var status = document.getElementById('notifyStatus');
     status.innerText = '';
     status.style.display = "none";
 }

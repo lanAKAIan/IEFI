@@ -1,4 +1,4 @@
-/*
+/* @license
  Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
  Copyright (C) 2013  Ian Scott Friedman
 
@@ -25,6 +25,8 @@ var userSettings = {};
 var userData = { userSettings: null
                 , storageVersion: null
                 , userViews: null };
+
+var compatibility = null;
 
 /**
  * checks to see if we are logged into the intel site. That way we don't get undefined errors.
@@ -62,6 +64,8 @@ var script = document.createElement('script');
     script.setAttribute("async", true);
     script.setAttribute("src", chrome.extension.getURL("injectScript.js"));
     head.insertBefore(script, head.firstChild);
+
+
 
 /**
  * This section sets up the message listeners in the content script for messages from the background.js page.
@@ -139,36 +143,50 @@ chrome.extension.onMessage.addListener(
             //console.log('response sent');
         }
         else if (request.request == "INITIALIZE") {
-            console.log('Content Script got a notification to initialize.');
             userData = request.userData;
             // create and dispatch the event
-            var event = new CustomEvent("IPP-INITIALIZED", {"detail": userData });
+            /*var event = new CustomEvent("IPP-INITIALIZED", {"detail": userData });
             document.dispatchEvent(event);
-            sendResponse({farewell:"USERDATA Initialize SENT TO CLIENT"});
+            sendResponse({farewell:"USERDATA Initialize SENT TO CLIENT"});*/
         }
-        else if (request.request == "INITIALIZE-INJECT") {
-            console.log('Content Script got a notification to initialize.');
+        else if (request.request == "NOTIFY_INIT_DATA") {
+            console.log('Content Script received initialization data');
             userData = request.userData;
+            compatibility = request.compatibility;
+            var initData = {"userData": userData, "compatibility": compatibility};
             // create and dispatch the event
-            var event = new CustomEvent("IPP-INITIALIZED", {"detail": userData });
+            var event = new CustomEvent("IPP-INITIALIZED", {"detail": initData });
             document.dispatchEvent(event);
             sendResponse({farewell:"USERDATA Initialize SENT TO CLIENT"});
         }
     });
 
 document.addEventListener("INITIALIZE", handleInjectInitRequest, false);
-
-
+/**
+ * This function is the listener for the injected script being initialized.
+ */
 function handleInjectInitRequest()
 {
-    chrome.extension.sendMessage({message:"GET_ALL_USER_DATA"}, function (response) {
+    //We should request the compatibility... and the userdata etc.
+    chrome.extension.sendMessage({message:"NEW-INITIALIZE-EVENT"}, function (response) {
         console.log('Content Script got a notification to initialize.');
-        userData = response.userData;
-        // create and dispatch the event
-        var event = new CustomEvent("IPP-INITIALIZED", {"detail": userData });
-        document.dispatchEvent(event);
     });
 }
+
+document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);
+/**
+ * This function is the listener for the injected script being initialized.
+ */
+function notifyTotalConversion()
+{
+    //We should request the compatibility... and the userdata etc.
+    chrome.extension.sendMessage({message:"TOTAL-CONVERSION-DETECTED"}, function (response) {
+        console.log('Content Script got a notification that it was in totalConversion.');
+    });
+}
+
+
+
 
 
 var screenshotStyle;
@@ -291,6 +309,12 @@ function handleVisibilityChange() {
             document.dispatchEvent(event);
         });
     }
+}
+
+/*Attempts to determine if ingress total conversion is all up in the page.*/
+function totallyConverted()
+{
+    return (document.querySelector('[src*=total-conversion]') ? true : false);
 }
 
 //We should probably make sure this is only added once, but since this is a content script it should be true.
