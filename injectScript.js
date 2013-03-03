@@ -30,7 +30,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
     //"somestringToRegex".replace(/(\(|\)|\.|\\)/g, '\\$1').replace(/([a-zA-Z$_]+)/g, '[a-zA-Z$_]+');
 	var signatures = {};
 		signatures.nativeFunction   = /\{ \[native code\] \}/;
-		signatures.redeem           = /var a = document\.getElementById\("passcode"\), b = a\.value;/;
+		signatures.redeem           = /var a=document\.getElementById\("passcode"\),b=a\.value;/;
         signatures.geocode          = /document\.getElementById\("address"\)/;
         signatures.map_in_geocode   = /([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+)\.fitBounds\([a-zA-Z_$]+\)/;
         signatures.cookieParser     = /return [a-zA-Z_$]+\("ingress\.intelmap\." \+ [a-zA-Z_$]+\)/;
@@ -135,7 +135,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         //IF we recognize it
         if(compatible)
         {
-            var targetLine = "a.la = new Re(T.c().r, a.h), a.la.v()";
+            var targetLine = "a.la=new Re(T.c().r,a.h),a.la.v()";
             var myLine = "\na.la.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
                 "\nvar c = document.getElementById(\"pl_tab_all\"), d = document.getElementById(\"pl_tab_fac\");" +
                 "\na.la.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";

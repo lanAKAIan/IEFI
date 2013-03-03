@@ -66,6 +66,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     var versionTree = [ null, //no version assume baseline
         "1.0.1.0",
         "1.0.2.0",
+        //"1.2.1.0",
         currentVersion ]; //currentVersion ensures we always update the version even if no upgrade needed
 	
 	var toLoad = {};
