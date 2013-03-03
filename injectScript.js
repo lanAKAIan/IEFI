@@ -62,11 +62,11 @@ function loadView(viewJSON)
 	//Set Zoom first. This way when we pan we are less likely to have a rounding error that is off from expected.
 	if(view.zoomLevel != undefined)
 	{
-		Z.d().h.setZoom(view.zoomLevel);
+		Z.c().h.setZoom(view.zoomLevel);
 	}
 	
 	var c = new google.maps.LatLng(view.latitude, view.longitude);
-	Z.d().h.panTo(c);
+	Z.c().h.panTo(c);
 	
 	//This is what actually moves the map
 	//Use the function defined in gen_dashboard.js by v("panto", function(a, b);
@@ -85,11 +85,12 @@ function getViewJSON()
 {
 	//create some JSON.
 	//https://developers.google.com/maps/documentation/javascript/reference#Map
-	var cv = Z.d().h.getCenter();
-	console.log(cv.Ya + ' ' + cv.Za + '    ' + Z.d().h.getZoom());
-	var currentView = '{"zoomLevel": ' + ve("zoom") + ',' +
-					   '"latitude": '  + ve("lat") + ',' +
-					   '"longitude": ' + ve("lng") + "}";
+	var cv = Z.c().h.getCenter();
+	console.log(cv.Ya + ' ' + cv.Za + '    ' + Z.c().h.getZoom());
+	var currentView = '{"zoomLevel": ' + te("zoom") + ',' +
+					   '"latitude": '  + te("lat") + ',' +
+					   '"longitude": ' + te("lng") + "}";
+	console.log('VIEW JSON: ' + currentView);
 	return currentView;
 }
 
