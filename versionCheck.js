@@ -61,9 +61,10 @@ var dashboardHashes = { "759f4a6f0401791573bbe2720240b9cb31e7bf72": { "knownComp
                         "4d1b4cfe7eb11ae7434444c4dadc0172cd9d1b1a": { "knownCompatableVersions": [ "1.0.2.0",
                                                                                                    "1.1.0.3" ],
                                                                       "length": 26546 },
-                        "7c782a69b1f59dc1afeaa56bf2f5e67106c62163": { "knownCompatableVersions": [ "1.2.1.0",
-                            parseVersion(chrome.app.getDetails().version).versionString],
-                            "length": 23839 }};
+                        "7c782a69b1f59dc1afeaa56bf2f5e67106c62163": { "knownCompatableVersions": [ "1.2.1.0", "1.2.2.0"], "length": 23839 },
+                        "8d180a277784ac2032968fed2bdb33c535f8d804": { "knownCompatableVersions": [ "1.2.3.0", parseVersion(chrome.app.getDetails().version).versionString], "length": 27341 }
+};
+
 
 /**
  * Sends an AJAX request to the server and retrieves the un-adulterated gen_dashboard.js. This is then processed to get the length and sha1 value of its contents.

@@ -117,8 +117,8 @@ if(!IPP.Injected){ IPP.Injected = {} };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(te(name)) };
-        hooks.dashboardConstructor = bf;
+        hooks.valueFromCookie   = function(name){ return(Oe(name)) };
+        hooks.dashboardConstructor = yf;
 
         //Originally I wanted to do something like this, but i could nto figure out how to make this the right way.
         /*
@@ -135,12 +135,12 @@ if(!IPP.Injected){ IPP.Injected = {} };
         //IF we recognize it
         if(compatible)
         {
-            var targetLine = /a\.la\s*=\s*new Re\(T\.c\(\).r,\s*a\.h\),\s*a\.la\.v\(\)/g;
-            var myLine = "\na.la.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
+            var targetLine = /a\.ka\s*=\s*new nf\(T\.c\(\).r,\s*a\.h\),\s*a\.ka\.u\(\)/g;
+            var myLine = "\na.ka.k = IPP.Injected.getUserSettings().comm_default_chat_tab;" + //Sets the default chat tab
                 "\nvar c = document.getElementById(\"pl_tab_all\"), d = document.getElementById(\"pl_tab_fac\");" +
-                "\na.la.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";
+                "\na.ka.k == \"all\" ? (K(c, \"tab_selected\"), L(d, \"tab_selected\")) : (K(d, \"tab_selected\"), L(c, \"tab_selected\"));";
             //replaceInFunction("bf",targetLine,targetLine+myLine)
-            appendInFunction("bf",targetLine,myLine);
+            appendInFunction("yf",targetLine,myLine);
         }
         else
         {

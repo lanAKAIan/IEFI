@@ -43,7 +43,7 @@ function installOrUpdate(install_details){
 	try
 	{
         /*We specifically are looking at all the tabs even if they are not currently visible incase the user has more than one intel page up*/
-		chrome.tabs.query({"windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
+		chrome.tabs.query({"windowType": "normal", "url": "*://www.ingress.com/intel*"}, function(tabResults) {
 			if(tabResults.length>0)
 			{
 				for(var i = 0; i < tabResults.length; i++)
@@ -70,7 +70,7 @@ function getVisibleTab(callback)
 {
     try
     {
-        chrome.tabs.query({"active": true, "windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
+        chrome.tabs.query({"active": true, "windowType": "normal", "url": "*://www.ingress.com/intel*"}, function(tabResults) {
             console.assert(tabResults.length == 1, tabResults.length > 1 ? "More Than one tab returned!" : "No tabs returned!");
             if(tabResults.length>0)
             {
@@ -281,7 +281,7 @@ function displayUnknownDashboardVersion()
 //Zoom16 is the least you can zoom and still see lvl 0 portals.
 //leave out the decimal point here.
 //http://www.ingress.com/intel?latE6=Latitude&lngE6=Longetude&z=AZoomLevel
-var IngressBaseURL = 'http://www.ingress.com/intel?';
+var IngressBaseURL = 'https://www.ingress.com/intel?';
 
 /*
 So we may want to change this to somehow include the screensize. Right now I think its based on perhaps the middle of the map? and zooming there?
@@ -525,7 +525,7 @@ var extensionCompatibility = null;
 //////////////////
 function updateUserSettings(updatedUserSettings)
 {
-	chrome.tabs.query({"windowType": "normal", "url": "http://www.ingress.com/intel*"}, function(tabResults) {
+	chrome.tabs.query({"windowType": "normal", "url": "*://www.ingress.com/intel*"}, function(tabResults) {
 		//We may get more than one tab, but thats ok... we want to update all of them.
 		console.log('updateUserSettings found ' + tabResults.length + ' ingress tabs');
 		console.log(JSON.stringify(tabResults));
