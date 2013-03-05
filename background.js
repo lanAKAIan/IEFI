@@ -17,7 +17,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
+//TODO: move all saves and gets to go through the storage manager... same with popup.
 /**
   * installOrUpdate
   * called when the extension is updated or installed... wow.
@@ -524,7 +524,9 @@ chrome.extension.onMessage.addListener(
         }
 
         //A new page load, so we want to check compatibility.
-        checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //TODO: make sure that fi an error occures determining the compatibility, we dont completely kill this. and stop the page loads.
+        checkDashboardCompatibility(compatFunc, extensionCompatibility, dashboardURI)
     }
     else if (request.message == "TOTAL-CONVERSION-DETECTED")
     {

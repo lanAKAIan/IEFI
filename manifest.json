@@ -1,6 +1,6 @@
 {
   "name": "Intelligence Enhancer for Ingress",
-  "version": "1.3.1.0",
+  "version": "1.4.0.1",
   "manifest_version": 2,
   "description": "Provides enhanced functionality to the ingress.com/intel site.",
   "page_action": {
@@ -23,6 +23,6 @@
 	"clipboardWrite",
 	"*://www.ingress.com/intel*" ],
   "optional_permissions": ["geolocation"],
-  "background": { "scripts": [ "background.js", "StorageManager.js", "Utilities.js", "versionCheck.js", "lib/CryptoJS/sha1.js", "lib/CryptoJS/enc-base64-min.js" ] },
+  "background": { "scripts": [ "background.js", "StorageManager.js", "Utilities.js", "versioning.js", "lib/CryptoJS/sha1.js", "lib/CryptoJS/enc-base64-min.js" ] },
   "web_accessible_resources": [ "injectScript.js", "res/icon-128-menu.png", "res/icon-48.png" ]
 }

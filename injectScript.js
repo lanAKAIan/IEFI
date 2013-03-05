@@ -222,8 +222,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 var defaultView = getDefaultView();
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
-                //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
-                var matches = signatures.dashboardConst.exec(yf.toString());
+                var matches = signatures.dashboardConst.exec(hooks.dashboardConstructor.toString());
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
                 //  matches[2] - zoomLevel variable

@@ -131,46 +131,96 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     {
         console.info("Previous storage version: " + userData.storageVersion);
 
-        //vhange to while
         while(userData.storageVersion != currentVersion)
         {
             console.log('Stored Data version mismatch detected.');
             switch(userData.storageVersion) //This becomes the from version
             {
                 case null:
-                    //Intentionally no break. null indicates its from the before time(before I was adding version numbers.)
+                    //If its a new user, they can shortcut to the latest version.
+                    if(userData.userViews.length == 0 && isEmpty(userData.userSettings))
+                    {
+                    	console.log('New installation detected. Will add missing settings and set to latest version.')
+                    	addMissingSettings();
+	        			fromVersionNumber =  versionTree[versionTree.length - 2]; //I dont like it, but this will let the default to next version take place
+                    	break;
+                    }
+                    else
+                    {
+                    	//Intentionally no break. null indicates its from the before time(before I was adding version numbers.)
+                    }
                 case "1.0.1.0":
+                	console.log("Upgrading from either initial two releases.");
+		            //The only thing that needs to be done is upgrade the version number since we didnt store it.
+		            //and to trigger next upgrade
                     //Technically we will never see this, we didnt version storage this early.
-                    upgrade(userData.storageVersion);
                     break;
                 case "1.0.2.0":
                     //Technically we will never see this, we didnt version storage this early.
-                    upgrade(userData.storageVersion);
+                    addMissingSettings();
                     break;
                 case "1.0.3.0":
                     //Not sure we ever released this version.
-                    upgrade(userData.storageVersion);
+                    //changing the default zoom level to 15 on the geolocation thing to show level 1 portals. since we never let them use the value, replace it.
+		            console.info('Modifying default user settings');
+		            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
+		            {
+		                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
+		                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
+		                //Some users may want this, and it was already a setting. Just changed default.
+		                //userData.userSettings.screenshot_visibility_search = "hide";
+		            }
+		            addGUIDsToViews();
+		            addMissingSettings();
                     break;
-                case "1.1.0.30":
-                    upgrade(userData.storageVersion);
-                    break;
-                case "1.2.0.6":
-                    upgrade(userData.storageVersion);
-                    break;
+                case "1.2.3.0":
+                case "1.3.0.3":
                 case "1.3.0.6":
-                    upgrade(userData.storageVersion);
-                    break;
                 case "1.3.0.7":
-                    upgrade(userData.storageVersion);
-                    break;
                 case "1.3.0.8":
-                    upgrade(userData.storageVersion);
+		            addMissingSettings(); // we can assume all the variables will at least exist then.
+		            console.info('Verifying auto-load settings')
+		            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
+		            {
+		                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
+		                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
+		                saveNeeded.userSettings = true;
+		            }
+		
+		            if(userData.userSettings.auto_load_view == "undefined") //Some beta testers had this.
+		            {
+		                console.info("Invalid auto_load_view detected, resetting to default");
+		                userData.userSettings.auto_load_view = defaultSettings["auto_load_view"];
+		
+		                if(userData.userSettings.auto_load_page === "saved")
+		                {
+		                    console.info("Resetting auto_load_page to default based on invalid view");
+		                    userData.userSettings.auto_load_page = defaultSettings["auto_load_page"];
+		                }
+		                if(userData.userSettings.auto_load_fresh === "saved")
+		                {
+		                    console.info("Resetting auto_load_fresh to default based on invalid view");
+		                    userData.userSettings.auto_load_fresh = defaultSettings["auto_load_fresh"];
+		                }
+		                saveNeeded.userSettings = true;
+		            }
+		
+		            console.info('Verifying stored views.');
+		            addGUIDsToViews();
                     break;
                 default:
                     //So ideally when we go in later with a version that doesnt need an upgrade, it will fall through to this.
-                    upgrade(userData.storageVersion);
+                    console.log('Upgrade from ' + fromVersionNumber + ' requires no storage changes.');
                     break;
             }
+            
+            //We know there was an upgrade and it should have been to the next version whatever that was.
+	        saveNeeded.storageVersion = true;
+	        userData.storageVersion = versionTree[versionTree.indexOf(fromVersionNumber) + 1];
+	        /* TODO: Right now if we are coming from an unknown version... or rather one not in the tree... it returns -1
+	         /        looking for it which we then add one to making it 0... which means we get null as the next version...
+	         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
+	        console.log("Upgrade from " + fromVersionNumber + " to " + userData.storageVersion + " complete.");
         }
     }
 
@@ -212,74 +262,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
             console.log('ERROR in renameStorage Variable @locus: ' + locus + ' \n ' + e.message);
         }
         return(success);
-    }
-
-    //Should this just be in the checkForUpgrade function? oh well.
-    ///yeah thats what we did essentially...
-    //TODO: merge with caller.
-    function upgrade(fromVersionNumber)
-    {
-        if(fromVersionNumber === "1.0.1.0")
-        {
-            console.log("Upgrading from either initial two releases.");
-            //The only thing that needs to be done is upgrade the version number since we didnt store it.
-            //and to trigger next upgrade
-        }
-        else if(fromVersionNumber === "1.0.2.0")
-        {
-            addMissingSettings();
-        }
-        else if(fromVersionNumber === "1.0.3.0")
-        {
-            //changing the default zoom level to 15 on the geolocation thing to show level 1 portals. since we never let them use the value, replace it.
-            console.info('Modifying default user settings');
-            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
-            {
-                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
-                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
-                //Some users may want this, and it was already a setting. Just changed default.
-                //userData.userSettings.screenshot_visibility_search = "hide";
-            }
-            addGUIDsToViews();
-            addMissingSettings();
-        }
-        else if(fromVersionNumber === "1.2.3.0" || fromVersionNumber === "1.3.0.3" || fromVersionNumber === "1.3.0.8") //TODO: verify version number at upload.
-        {
-            addMissingSettings(); // we can assume all the variables will at least exist then.
-            console.info('Verifying auto-load settings')
-            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
-            {
-                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
-                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
-            }
-
-            if(userData.userSettings.auto_load_view == "undefined") //Some beta testers had this.
-            {
-                console.info("Invalid auto_load_view detected, resetting to default");
-                userData.userSettings.auto_load_view = defaultSettings["auto_load_view"];
-
-                if(userData.userSettings.auto_load_page === "saved")
-                {
-                    console.info("Resetting auto_load_page to default based on invalid view");
-                    userData.userSettings.auto_load_page = defaultSettings["auto_load_page"];
-                }
-                if(userData.userSettings.auto_load_fresh === "saved")
-                {
-                    console.info("Resetting auto_load_fresh to default based on invalid view");
-                    userData.userSettings.auto_load_fresh = defaultSettings["auto_load_fresh"];
-                }
-            }
-
-            console.info('Verifying stored views.');
-            addGUIDsToViews();
-        }
-        //We know there was an upgrade and it should have been to the next version whatever that was.
-        saveNeeded.storageVersion = true;
-        userData.storageVersion = versionTree[versionTree.indexOf(fromVersionNumber) + 1];
-        /* TODO: Right now if we are coming from an unknown version... or rather one not in the tree... it returns -1
-         /        looking for it which we then add one to making it 0... which means we get null as the next version...
-         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
-        console.log("Upgrade from " + fromVersionNumber + " to " + userData.storageVersion + " complete.");
     }
 
     function addGUIDsToViews(callback)
@@ -369,7 +351,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 		if(saveNeeded.userSettings)
 		{
             console.info("User Settings have been changed, a save will be required.");
-			setUserSettings(userData.userSettings);
+			//setUserSettings(userData.userSettings);
 		}
         console.groupEnd();
 	}
