@@ -62,27 +62,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
 					  ,{"latitude":34.28040735750082,"longitude":-119.29248599212644,"viewName":"Downtown Ventura","zoomLevel":16}
-					  ,{"latitude":37.76016278842576,"longitude":-122.43828664550784,"viewName":"San Francisco","zoomLevel":12}];
-    var currentVersion = chrome.runtime.getManifest().version;
-    //Uses in the upgrade process.
-    var versionTree = [ null, //no version assume baseline
-        "1.0.1.0",
-        "1.0.2.0",
-        "1.1.0.30",
-        "1.2.0.6",
-        "1.2.1.0",
-        "1.2.2.0",
-        "1.2.3.0",
-        "1.3.0.6",
-        "1.3.0.7",
-        "1.3.0.8"];
-    if(versionTree[versionTree.length] != currentVersion)
-    {
-        //We are going to assume this is just a new build, and add it to the tree.
-        //currentVersion ensures we always update the version even if no upgrade needed
-        versionTree[versionTree.length] = currentVersion;
-    }
-	
+					  ,{"latitude":37.76016278842576,"longitude":-122.43828664550784,"viewName":"San Francisco","zoomLevel":12}];	
 	var toLoad = {};
 	
 	//Load up the settings from the chrome storage
@@ -129,12 +109,14 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     /*TODO: Remove this or fix it... right now it is wasted logic to do nothing*/
     function checkForUpgrade(callback)
     {
+    	var fromVersionNumber;
         console.info("Previous storage version: " + userData.storageVersion);
 
         while(userData.storageVersion != currentVersion)
         {
+        	fromVersionNumber = userData.storageVersion;
             console.log('Stored Data version mismatch detected.');
-            switch(userData.storageVersion) //This becomes the from version
+            switch(fromVersionNumber) //This becomes the from version
             {
                 case null:
                     //If its a new user, they can shortcut to the latest version.
@@ -142,7 +124,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     {
                     	console.log('New installation detected. Will add missing settings and set to latest version.')
                     	addMissingSettings();
-	        			fromVersionNumber =  versionTree[versionTree.length - 2]; //I dont like it, but this will let the default to next version take place
+	        			fromVersionNumber =  versionTree[versionTree.length - 2].version; //I dont like it, but this will let the default to next version take place
                     	break;
                     }
                     else
@@ -216,7 +198,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
             
             //We know there was an upgrade and it should have been to the next version whatever that was.
 	        saveNeeded.storageVersion = true;
-	        userData.storageVersion = versionTree[versionTree.indexOf(fromVersionNumber) + 1];
+	        userData.storageVersion = getNextVersion(fromVersionNumber);
 	        /* TODO: Right now if we are coming from an unknown version... or rather one not in the tree... it returns -1
 	         /        looking for it which we then add one to making it 0... which means we get null as the next version...
 	         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
@@ -309,7 +291,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 
     function resetVersion()
     {
-        userData.storageVersion = versionTree[0];
+        userData.storageVersion = versionTree[0].version;
         saveNeeded.storageVersion = true;
 
         //SPECIFICALLY USE savedViews

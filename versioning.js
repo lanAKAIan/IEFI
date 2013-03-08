@@ -3,7 +3,7 @@
  * Idea is to fix the need to update versions in multiple places
  */
 
-//TODO: Find a way to incorporate upgrade process into this... or atleast the checks and know which version to go to.
+//TODO: Find a way to incorporate upgrade process into this... or at least the checks and know which version to go to.
 /**
  * Flag for testing. When true, we will always use the alternate method of hooking in functionality.
  * @type {Boolean}
@@ -11,31 +11,37 @@
 var forceIncompatibile = false;
 
 //Use runtime over extension... for event pages...
-var currentVersion = chrome.runtime.getManifest().version;
-var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72" },
-    {"sha1": "4d1b4cfe7eb11ae7434444c4dadc0172cd9d1b1a", "length": 26546 },
-    {"sha1": "7c782a69b1f59dc1afeaa56bf2f5e67106c62163", "length": 23839 },
-    {"sha1": "8d180a277784ac2032968fed2bdb33c535f8d804", "length": 27341 } ];
+var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
+
+var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72" }, //"length": ?
+					    {"sha1": "4d1b4cfe7eb11ae7434444c4dadc0172cd9d1b1a", "length": 26546 },
+					    {"sha1": "7c782a69b1f59dc1afeaa56bf2f5e67106c62163", "length": 23839 },
+					    {"sha1": "8d180a277784ac2032968fed2bdb33c535f8d804", "length": 27341 },
+					    {"sha1": "7a0f9cd8319f7b1f764fadcfd05b68bce6065f89", "length": 27840 } ];
 
 /*
- * upgrade process implies an upgrade process is needed to get to this version, not necessarily from it to the next.
+ * upgrade process flag implies an upgrade process is needed to get to this version, not necessarily from it to the next.
  * */
-var versionTree = { "1.0.0.0": { "compatible": dashboardHashes[0], upgradeProcess: false },
-    "1.0.1.0": { "compatible": dashboardHashes[0], upgradeProcess: false },
-    "1.0.2.0": { "compatible": dashboardHashes[1], upgradeProcess: false },
-    "1.1.0.30":{ "compatible": dashboardHashes[1], upgradeProcess: true  },
-    "1.2.0.6": { "compatible": dashboardHashes[1], upgradeProcess: true  },
-    "1.2.1.0": { "compatible": dashboardHashes[2], upgradeProcess: false },
-    "1.2.2.0": { "compatible": dashboardHashes[2], upgradeProcess: false },
-    "1.2.3.0": { "compatible": dashboardHashes[3], upgradeProcess: false },
-    "1.3.0.9": { "compatible": dashboardHashes[3], upgradeProcess: true  } };
+var versionTree = [  { "version": "1.0.0.0",  "compatible": dashboardHashes[0], upgradeProcess: false },
+				     { "version": "1.0.1.0",  "compatible": dashboardHashes[0], upgradeProcess: false },
+				     { "version": "1.0.2.0",  "compatible": dashboardHashes[1], upgradeProcess: false },
+				     { "version": "1.1.0.30", "compatible": dashboardHashes[1], upgradeProcess: true  },
+				     { "version": "1.2.0.6" , "compatible": dashboardHashes[1], upgradeProcess: true  },
+				     { "version": "1.2.1.0" , "compatible": dashboardHashes[2], upgradeProcess: false },
+				     { "version": "1.2.2.0" , "compatible": dashboardHashes[2], upgradeProcess: false },
+				     { "version": "1.2.3.0" , "compatible": dashboardHashes[3], upgradeProcess: false },
+				     { "version": "1.3.0.9" , "compatible": dashboardHashes[3], upgradeProcess: true  },
+				     { "version": "1.3.1.0" , "compatible": dashboardHashes[3], upgradeProcess: false },
+				     { "version": "1.3.2.2" , "compatible": dashboardHashes[4], upgradeProcess: false } ];
 
-if(typeof versionTree[currentVersion] === "undefined")
+if(versionTree[versionTree.length -1].version !== currentVersion)
 {
     //We are going to assume this is just a new build, and add it to the tree.
     //currentVersion ensures we always update the version even if no upgrade needed
-    versionTree[currentVersion] = { "compatible": dashboardHashes[dashboardHashes.length -1] };
+    versionTree[versionTree.length] = {"version": currentVersion, "compatible": dashboardHashes[dashboardHashes.length -1], upgradeProcess: false  }
 }
+
+
 
 /**
  * Checks a dashboard hash against the known version/hash table to determine if it thinks it is compatible.
@@ -46,13 +52,40 @@ if(typeof versionTree[currentVersion] === "undefined")
  */
 function isDashboardCompatible(sha1, callback)
 {
-    var retVal = (versionTree[currentVersion].compatible.sha1 === sha1);
+    var retVal = (versionTree[versionTree.length -1].compatible.sha1 === sha1);
 
     if(typeof callback !== "undefined")
     {
         callback(retVal);
     }
     return(retVal);
+}
+
+/**
+ *Pass in a version string... returns an object for the next version. 
+ */
+function getNextVersion(fromVersion)
+{
+	var i, retVal;
+	for(i = 0; i < versionTree.length; i++)
+	{
+		if(versionTree[i].version === fromVersion)
+		{
+			break;
+		}
+	}
+	if(i < versionTree.length - 1)
+	{
+		//there is a next version
+		retVal = versionTree[i+1].version;
+	}
+	else
+	{
+		//this is the latest version
+		retVal = null;
+	}
+	
+	return retVal;
 }
 
 /**
