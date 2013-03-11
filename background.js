@@ -90,9 +90,7 @@ function getVisibleTab(callback)
 
 function getSavedViews( callback )
 {
-	//chrome.storage.sync.set({'savedViews': tempViews});
-	chrome.storage.sync.get('userViews', function(r){callback(r.userViews);});
-	//console.log('done!');
+	callback(IPP.StorageManager.getUserViews());
 }
 
 function loadView(view)
@@ -105,70 +103,63 @@ function loadView(view)
     getVisibleTab(loadV);
 }
 
-//PAss me a view object not json!
-function saveView(view)
-{
-    view.guid = getGUID();
-	//we should already have a cache so this should be fixed... anyway for now do this.
-	//1. get the views
-	//2 once we got the viwes, add the new one
-	//3. update the display or not? may be calback aded to function?
-	chrome.storage.sync.get('userViews', function(r){
-											var x;
-											if(r.userViews != undefined)
-											{
-												x = r.userViews
-											}
-											else
-											{
-												x = [];
-											}								
-											
-											//console.info('savedViews length pre add:' + x.length);
-											x[x.length] = view;
-											
-											//r[r.length] = view;
-										  chrome.storage.sync.set({"userViews": x}, function() {
-																						console.info('view added to storage');})
-																						});
+/**
+  *   @name: saveView
+  *   @description: pass a view object and this function will send it to the StorageManager for saving.
+  *   @param: view: {latitude: value, longitude: value, zoomLevel: value}
+  *   @return: NA
+  */
+function saveView(view) {
+    //Add a guid to the view since all we were passed is the plysical view information.
+        view.guid = getGUID();
+
+        var handleViews = function(viewArray) {
+            var x;
+            if (viewArray != undefined) {
+                x = viewArray
+            } else {
+                x = [];
+            }
+
+            //console.info('savedViews length pre add:' + x.length);
+            x[x.length] = view;
+            
+            var afterAdd = function(){console.info('view added to storage');};            
+            IPP.StorageManager.setUserViews(x, afterAdd);
+        }
+        getSavedViews(handleViews);
+    }
+
+function removeView(viewToRemove) {
+
+    //we shoudl already have a cache so this shoudl be fixed... anyway for now do this.
+
+    //1. get the views
+    //2 once we got the viwes, add the new one
+    //3. update the display or not? may be calback aded to function?
+    //console.log('background.js.remove view called with ' + view);
+
+    var handleViews = function(viewArray) {
+        var x = viewArray;
+        //TODO: make sure there is a viewArray to remove from.
+        for (var i = 0; i < x.length; i++) {
+            if (x[i].guid === viewToRemove.guid) {
+                //console.info('Im removing: ' + i);
+                x.splice(i, 1);
+                //remove one item at that index
+                break;
+                //break outa loop
+            }
+        }
+
+        //now we update the storage
+        var afterRemove = function() {
+            console.info('view removed from storage');
+        };
+        IPP.StorageManager.setUserViews(x, afterRemove);
+    }
+    getSavedViews(handleViews);    
 }
-
-function removeView(view)
-{
-	
-	//we shoudl already have a cache so this shoudl be fixed... anyway for now do this.
-	
-	//1. get the views
-	//2 once we got the viwes, add the new one
-	//3. update the display or not? may be calback aded to function?
-	//console.log('background.js.remove view called with ' + view);
-	chrome.storage.sync.get('userViews', function(r){
-											//console.info('savedViews length pre remove:' + r.savedViews.length);
-											var x = r.userViews;
-											var removeView = JSON.stringify(view);
-											var i=0;
-											while(i < x.length)
-											{
-												//console.info('Im at index: ' + i);
-												//splice it out if found
-												//console.info('remove view: ' + removeView);
-												//console.info('cur view[' + i + ']:' + JSON.stringify(x[i]));
-												if(JSON.stringify(x[i]) === removeView)
-												{
-													//console.info('Im removing: ' + i);
-													x.splice(i,1); //remove one item at that index
-													break; //break outa loop
-												}
-												i++;
-											}
-											//console.info('savedViews length post remove:' + r.savedViews.length);
-										  chrome.storage.sync.set({"userViews": x}, function() {
-																						console.info('view removed from storage');})
-																						});
-	
-}
-
-
 
 function getCurrentView( callback )
 {

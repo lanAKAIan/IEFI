@@ -389,6 +389,15 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
         saveUserData(callback);
 	}
 	
+	/*Takes as input a settings object... overwrites the user settings with it. May want to do error checking on what we get.*/
+    setUserViews = function(viewsObject, callback)
+    {
+        userData.userViews = viewsObject;
+        saveNeeded.userViews = true;
+
+        saveUserData(callback);
+    }
+	
 	//Returns an Array of userViews. not JSON
 	getUserViews = function()
 	{
@@ -418,7 +427,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
             userData.storageVersion = newData.storageVersion;
             userData.userSettings = newData.userSettings
             userData.userViews = newData.userViews; //Wow... i really gotta fix this naming...
-
         }
         saveUserData(callback);
     }
@@ -427,6 +435,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 	ns.init = init;
 	ns.getUserSettings = getUserSettings;
 	ns.getUserViews = getUserViews;
+	ns.setUserViews = setUserViews;
 	ns.setUserSettings = setUserSettings;
     ns.getAllData = getAllData;
     ns.setAllData = setAllData;
