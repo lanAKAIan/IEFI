@@ -13,7 +13,8 @@ var forceIncompatibile = false;
 //Use runtime over extension... for event pages...
 var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
 
-var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72" }, //"length": ?
+//So, interesting thought is this is the gzip compressed size/length of the file.
+var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "length": null  },
 					    {"sha1": "4d1b4cfe7eb11ae7434444c4dadc0172cd9d1b1a", "length": 26546 },
 					    {"sha1": "7c782a69b1f59dc1afeaa56bf2f5e67106c62163", "length": 23839 },
 					    {"sha1": "8d180a277784ac2032968fed2bdb33c535f8d804", "length": 27341 },
@@ -133,7 +134,12 @@ function retrieveDashboard(callback, dashboardURI)
             }
             // innerText does not let the attacker inject HTML elements.
             console.log('Got something back');
-            var ret = { "sha1": generateSHA1(xhr.response), "length": xhr.getResponseHeader("Content-Length"), "status": xhr.status, "statusText": xhr.statusText}
+            var ret = { "sha1": generateSHA1(xhr.response), 
+                        "length": xhr.getResponseHeader("Content-Length"), 
+                        "status": xhr.status, 
+                        "statusText": xhr.statusText,
+                        "loggedIn": (xhr.getResponseHeader("Content-Type") === "application/javascript" ? true : false) }
+                        
             lastDashboardRetrieved = xhr.response;
             if(typeof callback !== "undefined")
             {
@@ -226,19 +232,27 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
         if(dbInfo.status == 200)
         {
             //200 status code would be regular.
-            //Now we jsut need to see if we recognize the hash.
-            if(isDashboardCompatible(dbInfo.sha1))
+            if(dbInfo.loggedIn === true)
             {
-                retVal.compatibility = "compatible";
-                console.info("Dashboard determined to be compatible.");
+                //Now we jsut need to see if we recognize the hash.
+                if(isDashboardCompatible(dbInfo.sha1))
+                {
+                    retVal.compatibility = "compatible";
+                    console.info("Dashboard determined to be compatible.");
+                }
+                else
+                {
+                    retVal.compatibility = null;
+                    console.info("Successfully retrieved dashboard, but we dont recognize it so compatability is unknown.");
+                }
             }
             else
             {
-                console.info("Successfully retrieved dashboard, but it was determined to be incompatible.");
+                retVal.compatibility = "ignore";
+                console.info("It appears that the user was not authenticated, and we were redirected to login page.");
             }
-
         }
-        else if(dbInfo.status == "timeout")
+        else if(dbInfo.status === "timeout")
         {
             console.warn("We had a timeout and the version of the dashboard is unknown to us. Some functions may not work correctly.");
             retVal.compatibility = "unknown";
@@ -249,7 +263,7 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
             retVal.compatibility = "unknown";
         }
 
-        if(retVal.compatibility == "unknown")
+        if(retVal.compatibility === "unknown")
         {
             console.warn("This version of the dashboard is unknown to us. Some functions may not work correctly.");
         }

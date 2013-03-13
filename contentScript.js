@@ -26,7 +26,8 @@ var userData = { userSettings: null
 var transientData = { "userLocation": { "status": "pending",
                                         "message": "Geolocation retrieval has not yet been attempted."},
                       "initialized": false,
-                      "compatibility": "incompatible" };
+                      "compatibility": "incompatible",
+                      "IITCDetected": false };
 
 /**
  * checks to see if we are logged into the intel site. That way we don't get undefined errors.
@@ -91,6 +92,13 @@ var script = document.createElement('script');
     script.setAttribute("type", "text/javascript");
     script.setAttribute("async", true);
     script.setAttribute("src", chrome.extension.getURL("injectScript.js"));
+    head.insertBefore(script, head.firstChild);
+    
+//Now adding in IITC plugin    
+    script = document.createElement('script');
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("async", true);
+    script.setAttribute("src", chrome.extension.getURL("iitc-connection.js"));
     head.insertBefore(script, head.firstChild);
 
 /**
@@ -213,6 +221,7 @@ document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);
 function notifyTotalConversion()
 {
     //We should request the compatibility... and the userdata etc.
+    transientData.IITCDetected = true;
     chrome.extension.sendMessage({message:"TOTAL-CONVERSION-DETECTED"}, function (response) {
         console.log('Content Script got a notification that it was in totalConversion.');
     });
@@ -380,12 +389,6 @@ function requestUserLocation(callback){
         }
         navigator.geolocation.getCurrentPosition(handleGeolocation, handleGeoError, opts);
     }
-}
-
-/*Attempts to determine if ingress total conversion is all up in the page.*/
-function totallyConverted()
-{
-    return (document.querySelector('[src*=total-conversion]') ? true : false);
 }
 
 //This sections is to handle when we want to display the pageAction icon
