@@ -48,7 +48,8 @@ if(!IPP.Injected){ IPP.Injected = {} };
     var transientData = { "userLocation": {"status": "pending",
                                          "message": "Geolocation retrieval has not yet been attempted."},
                           "initialized": false,
-                          "compatibility": "incompatible" };
+                          "compatibility": "incompatible",
+                          "IITCDetected": false };
 
     /* Responsible for storing and overriding the normal ingress initiating so we can do any customization we need first.
      * */
@@ -223,6 +224,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
                 //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
+                //var matches = signatures.dashboardConst.exec(hooks.dashboardConstructor.toString());
                 var matches = signatures.dashboardConst.exec(Jf.toString());
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
@@ -313,6 +315,16 @@ if(!IPP.Injected){ IPP.Injected = {} };
         }
     }
 
+    /*Attempts to determine if ingress total conversion is all up in the page.*/
+    function totallyConverted()
+    {
+        return (transientData.IITCDetected);
+    }
+    
+    function setTotallyConverted(isIITC)
+    {
+        transientData.IITCDetected = isIITC;
+    }
 
     function addScript(scriptCode)
     {
@@ -470,50 +482,36 @@ if(!IPP.Injected){ IPP.Injected = {} };
 		   
 		 //Of course we should do more than just catch the error... ie not go further.
 		console.assert(view.latitude != undefined && view.longitude != undefined && view.zoomLevel != undefined);
+		console.log('total conversion status: ' + totallyConverted());
+		if(totallyConverted())
+        {
+                try{
+                    var view = JSON.parse(viewJSON);
+                }catch(e){
+                    console.error('injectScript.js.loadView unable to parse JSON!\n ERROR: ' + e.message);}
+                map.setView([view.latitude, view.longitude], view.zoomLevel);
+        }
+        else
+        {
+            //Set Zoom first. This way when we pan we are less likely to have a rounding error that is off from expected.
+            if(view.zoomLevel != undefined)
+            {
+                hooks.setZoom(view.zoomLevel); //was z.d
+            }
+            
+            var c = new google.maps.LatLng(view.latitude, view.longitude);
+            hooks.panTo(c); //was z.d
+            
+            //This is what actually moves the map
+            //Use the function defined in gen_dashboard.js by v("panto", function(a, b);
+            //panto(view.latitude, view.longitude);
+            //The oa() >0 live caused loading the same view to zoom in and out on occasion.
+            //For now, we will just manually write.
+        }
 		
-		//Set Zoom first. This way when we pan we are less likely to have a rounding error that is off from expected.
-		if(view.zoomLevel != undefined)
-		{
-            hooks.setZoom(view.zoomLevel); //was z.d
-		}
 		
-		var c = new google.maps.LatLng(view.latitude, view.longitude);
-        hooks.panTo(c); //was z.d
-		
-		//This is what actually moves the map
-		//Use the function defined in gen_dashboard.js by v("panto", function(a, b);
-		//panto(view.latitude, view.longitude);
-		//The oa() >0 live caused loading the same view to zoom in and out on occasion.
-		//For now, we will just manually write.
 	}
 
-    /*Attempts to determine if ingress total conversion is all up in the page.*/
-    function totallyConverted()
-    {
-        //return ((typeof window.iitcLoaded !== "undefined"));
-        return (document.querySelector('[src*=total-conversion]') ? true : false);
-    }
-
-    /*Do basic overrides for the user... to give basic functionality... load and save.*/
-    if(totallyConverted())
-    {
-        console.log('total conversion detected, hacking back in view loading.')
-        loadView = function(viewJSON)
-        {
-            try{
-                var view = JSON.parse(viewJSON);
-            }catch(e){
-                console.error('injectScript.js.loadView unable to parse JSON!\n ERROR: ' + e.message);}
-            map.setView([view.latitude, view.longitude], view.zoomLevel);
-        }
-
-        //Notify the user wel
-        //Ask content script for init.
-        var event = new CustomEvent("TOTAL-CONV-DETECT", {"detail": "detected" });
-            document.dispatchEvent(event);
-            console.log('TOTAL-CONV-DETECT');
-    }
-	
 	/**
 	*	@name: getViewJSON
 	*	@description: - pulls the current viewwindow data from the intel map and ereturns it in JSON syntax.
@@ -584,7 +582,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
     /**
      * Determines if an object has any properties.
-     * If it does not, the gor in will not run, and we will return true.
+     * If it does not, the for in will not run, and we will return true.
      * @param someObject the object that should be tested for properties
      * @return {Boolean}
      */
@@ -627,6 +625,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
     ns.swapClass = swapClass;
     ns.getDefaultView = getDefaultView;
     ns.findFunctionContaining2 = findFunctionContaining2;
+    ns.setTotallyConverted = setTotallyConverted;
     ns.hooks = hooks;
 })();
 IPP.Injected.init();

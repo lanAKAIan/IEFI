@@ -17,7 +17,6 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 /**
   * installOrUpdate
   * called when the extension is updated or installed... wow.
@@ -253,7 +252,8 @@ function notifyUserOfTotalConversion()
 
 function notifyUserOfCompatibility(compat)
 {
-    if(compat.compatibility != "compatible")
+    //TODO: we dont want to keep adding this message if it is already showing
+    if(compat.compatibility !== "compatible" && compat.compatibility !== "ignore")
     {
         var title = "Unknown Dashboard Version Detected";
         var msg   = "Some functionality may not work until extension is updated. Click here to learn more.";
@@ -515,7 +515,9 @@ chrome.extension.onMessage.addListener(
         }
 
         //A new page load, so we want to check compatibility.
-        checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //TODO: make sure that if an error occures determining the compatibility, we dont completely kill this. and stop the page loads.
+        checkDashboardCompatibility(compatFunc, extensionCompatibility, dashboardURI)
     }
     else if (request.message == "TOTAL-CONVERSION-DETECTED")
     {
