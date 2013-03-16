@@ -195,6 +195,8 @@ chrome.extension.onMessage.addListener(
                 // create and dispatch the event
                 var event = new CustomEvent("IPP-INITIALIZED", {"detail": initData });
                 document.dispatchEvent(event);
+                
+                fixSelectables();
             }
             requestUserLocation(initInjected);
 
@@ -330,6 +332,33 @@ function hidePII(hide, callback) {
 
     } catch (e) {
         console.error('There was a problem changing the visibility of Ingress Components: \n' + locus + '\n' + e.message);
+    }
+}
+
+var selectablesStyle;
+function fixSelectables() {
+    var locus = "";
+
+    var selectableCSS = ""; //fill it out then append
+    try {
+        console.log('im going in');
+            if (userData.userSettings.nonselectable_spinner === "on") {
+                locus = "Making Loading... less annoying.";
+                selectableCSS += "#map_spinner {pointer-events: none;}";
+                console.log('selectableCSS: ' + selectableCSS);
+                selectablesStyle = document.createElement('style');
+                selectablesStyle.setAttribute("type", "text/css");
+                selectablesStyle.appendChild(document.createTextNode(selectableCSS));
+                head.appendChild(selectablesStyle);
+                console.log('sent append style');
+            }
+            else if(typeof selectablesStyle !== "undefined")
+            {
+                document.removeChild(selectablesStyle);
+            }
+
+    } catch (e) {
+        console.error('There was a problem making loading... unselectable: \n' + locus + '\n' + e.message);
     }
 }
 

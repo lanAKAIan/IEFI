@@ -203,6 +203,13 @@
 				<label class="c"><input type="radio" name="redeem_passcode_cleanse" value="off" id="cleanse_passcodes_off"><span>Off</span></label>
 				<h4 class="description">Automatically trims whitespace(new lines, spaces, etc) from input box before submitting. Im looking at you Decode Ingress.</h4>
 			</div>
+			<div class="horizontalFlex">
+				<h3>Less Annoying Loading</h3>
+				<label class="c"><input type="radio" name="nonselectable_spinner" value="on" id="nonselectable_spinner_on"><span>On</span></label>
+				<label class="c"><input type="radio" name="nonselectable_spinner" value="off" id="nonselectable_spinner_off"><span>Off</span></label>
+				<h4 class="description">Makes the "Loading Data..." text non-selectable so you dont select the whole page while panning the map.</h4>
+				<!--Adds css pointer-events: none; to the surrounding div.-->
+			</div>
 		</section>
 		<!--<button id="getJSON" type="button">getJSON</button>-->
 		<button id="saveButton" type="button">Save Changes</button><div id="SaveStatusBox"></div>

@@ -57,7 +57,8 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                             , "auto_load_page":                 "last"
                             , "auto_load_geo_zoom":             15
                             , "auto_load_view":                 null
-							, "redeem_passcode_cleanse": 		"on" };
+							, "redeem_passcode_cleanse": 		"on"
+							, "nonselectable_spinner":          "on"};
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
@@ -189,6 +190,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 		
 		            console.info('Verifying stored views.');
 		            addGUIDsToViews();
+                    break;
+                case "1.3.2.2":
+                    addMissingSettings(); //
                     break;
                 default:
                     //So ideally when we go in later with a version that doesnt need an upgrade, it will fall through to this.
@@ -337,6 +341,56 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 		}
         console.groupEnd();
 	}
+	
+	/**
+	 * Adds a setting. if no value provided, it will ook into the default value array.
+	 *
+	 */
+    function addSetting(settingName, settingValue)
+    {
+        console.group("Adding Setting: " + settingName);
+        
+        console.info("Current userSettings: " + JSON.stringify(userData.userSettings));
+                
+        if(typeof userData.userSettings !== "undefined")
+        {
+            if(typeof userData.userSettings[settingName] === "undefined")
+            {
+                console.info("Detected missing setting, loading default for: " + defSetting);
+                
+                if(typeof settingValue === "undefined")
+                {
+                    console.info("Missing setting detected, and no value provided. Loading Default");
+                    if(typeof defaultSettings[settingName] !== "undefined")
+                    {
+                        userData.userSettings[settingName] = defaultSettings[settingName];
+                        saveNeeded.userSettings = true;
+                    }
+                }
+                else
+                {
+                    console.info("Missing setting detected, loading passed in value.");
+                    userData.userSettings[settingName] = settingValue;
+                    saveNeeded.userSettings = true;
+                }
+            }
+            else
+            {
+                console.info("setting was already present");
+            }
+        }
+        else
+        {
+            //Check all the settings we have defaults for, and load them in if needed
+            console.error('User Settings not present yet.');
+        }
+        if(saveNeeded.userSettings)
+        {
+            console.info("User Settings have been changed, a save will be required.");
+            //setUserSettings(userData.userSettings);
+        }
+        console.groupEnd();
+    }
 	
 	//Returns an Array of userSettings. Not JSON.
 	getUserSettings = function()
