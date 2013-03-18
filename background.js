@@ -238,25 +238,25 @@ function displayChangelog()
 function notifyUserOfTotalConversion()
 {
         var title = "Ingress Total Conversion Detected";
-        var msg   = "Only basic functionality will be available. (screenshot, load/save views)";
+        var msg   = "Only basic functionality(screenshot, load/save views) will be available. You can disable this message permanently in the extension settings.";
         var img   = "res/icon-48.png";
         var notify = generateTOAST(img,title, msg);
         notify.addEventListener( 'click', function(){notify.cancel()});
-        var closein10 = function()
+        var closein15 = function()
         {
-            setTimeout(function(){notify.cancel()}, 10000);
+            setTimeout(function(){notify.cancel()}, 15000);
         }
-        notify.addEventListener( 'show', closein10);
+        notify.addEventListener( 'show', closein15);
         notify.show();
 }
 
 function notifyUserOfCompatibility(compat)
 {
     //TODO: we dont want to keep adding this message if it is already showing
-    if(compat.compatibility !== "compatible" && compat.compatibility !== "ignore")
+    if(compat.compatibility !== "compatible" && compat.compatibility !== "ignore" && IPP.StorageManager.getUserSettings().dashboard_incompatibility_warn === "on")
     {
         var title = "Unknown Dashboard Version Detected";
-        var msg   = "Some functionality may not work until extension is updated. Click here to learn more.";
+        var msg   = "Some or all functionality may not work until extension is updated. Click here to learn more. You can disable this message in the extension settings.";
         var img   = "res/icon-48.png";
         var notify = generateTOAST(img,title, msg);
         notify.addEventListener( 'click', function(){displayUnknownDashboardVersion();notify.cancel()});
@@ -522,8 +522,15 @@ chrome.extension.onMessage.addListener(
     else if (request.message == "TOTAL-CONVERSION-DETECTED")
     {
         sendResponse({farewell: "goodbye"}); //close the connection.
-
-        notifyUserOfTotalConversion();
+        if(IPP.StorageManager.getUserSettings().iitc_incompatibility_warn === "on")
+        {
+            notifyUserOfTotalConversion();
+        }
+        else
+        {
+            console.info('IITC Detected, but the user has disabled the notification.');
+        }
+        
     }
   });
 

@@ -58,7 +58,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                             , "auto_load_geo_zoom":             15
                             , "auto_load_view":                 null
 							, "redeem_passcode_cleanse": 		"on"
-							, "nonselectable_spinner":          "on"};
+							, "nonselectable_spinner":          "on"
+							, "iitc_incompatibility_warn":      "on"
+							, "dashboard_incompatibility_warn": "on" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
@@ -199,7 +201,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     console.log('Upgrade from ' + fromVersionNumber + ' requires no storage changes.');
                     break;
             }
-            
+            resetDashbaordIncompatibilityWarning();
             //We know there was an upgrade and it should have been to the next version whatever that was.
 	        saveNeeded.storageVersion = true;
 	        userData.storageVersion = getNextVersion(fromVersionNumber);
@@ -208,6 +210,13 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 	         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
 	        console.log("Upgrade from " + fromVersionNumber + " to " + userData.storageVersion + " complete.");
         }
+    }
+    
+    function resetDashbaordIncompatibilityWarning()
+    {
+        console.log('Resetting dashboard incompatability warning');
+        userData.userSettings.dashboard_incompatibility_warn = "on";
+        saveNeeded.userSettings = true;
     }
 
 

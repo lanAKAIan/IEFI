@@ -8,7 +8,7 @@
  * Flag for testing. When true, we will always use the alternate method of hooking in functionality.
  * @type {Boolean}
  */
-var forceIncompatibile = false;
+var forceIncompatible = false;
 
 //Use runtime over extension... for event pages...
 var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
@@ -60,7 +60,7 @@ function isDashboardCompatible(sha1, callback)
     {
         callback(retVal);
     }
-    return(retVal);
+    return(retVal && !forceIncompatible);
 }
 
 /**
@@ -221,7 +221,7 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
 {
     //console.groupCollapsed("Dashboard Compatibility Check").
         console.info('Checking compatibility of dashboard with extension version ' + currentVersion);
-    if(forceIncompatibile)
+    if(forceIncompatible)
     {
         console.warn('forceIncompatible setting is turned on, function will all ways return "unknown" compatibility.');
     }

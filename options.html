@@ -192,7 +192,7 @@
                 <h4 class="description">For the "Geo-Location" options, this is the default zoom level the view will load with. Higher numbers indicate increased magnification.</h4>
             </div>
         </section>
-		<header class="cathead">
+        <header class="cathead">
 			<h2>Other</h2>
 			<p>Where else would we put them?</p>
 		</header>
@@ -209,6 +209,24 @@
 				<label class="c"><input type="radio" name="nonselectable_spinner" value="off" id="nonselectable_spinner_off"><span>Off</span></label>
 				<h4 class="description">Makes the "Loading Data..." text non-selectable so you dont select the whole page while panning the map.</h4>
 				<!--Adds css pointer-events: none; to the surrounding div.-->
+			</div>
+		</section>
+		<header class="cathead">
+			<h2>Version Notifications</h2>
+			<p>Hey, you can't expect every section to have a witty description.</p>
+		</header>
+		<section class="catlinks">
+			<div class="horizontalFlex">
+				<h3>IITC Incompatibility</h3>
+				<label class="c"><input type="radio" name="iitc_incompatibility_warn" value="on" id="iitc_incompatibility_warn_on"><span>On</span></label>
+				<label class="c"><input type="radio" name="iitc_incompatibility_warn" value="off" id="iitc_incompatibility_warn_off"><span>Off</span></label>
+				<h4 class="description">Turning this setting off will keep the extension from pointing out some features may not work with IITC.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Dashboard Incompatibility</h3>
+				<label class="c"><input type="radio" name="dashboard_incompatibility_warn" value="on" id="dashboard_incompatibility_warn_on"><span>On</span></label>
+				<label class="c"><input type="radio" name="dashboard_incompatibility_warn" value="off" id="dashboard_incompatibility_warn_off"><span>Off</span></label>
+				<h4 class="description">Turning this setting off will keep the extension from harassing you that it doesn't recognize the dashboard until the next release.</h4>
 			</div>
 		</section>
 		<!--<button id="getJSON" type="button">getJSON</button>-->
