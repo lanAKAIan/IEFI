@@ -16,7 +16,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 //Utilities.js
 
 //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript

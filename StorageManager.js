@@ -31,6 +31,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     var saveNeeded = { userSettings: false
                      , storageVersion: false
                      , userViews: false };
+                     
+    var infiniteLoopCount = 0; /*This is here incase I mess up logic and we end up looping indefinately.*/
+    var infiniteLoopBlock = 100; /*This is here incase I mess up logic and we end up looping indefinately.*/
 	
 	var userSettings = {};
 	//So in some respect I feel this should be somewhere else. Perhaps also have the objects be part of a thing to build the options page... ie a option default value description thing.
@@ -76,6 +79,12 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 			userData.userViews 		= r.userViews || r.savedViews || []; //For 1.3 we are renaming saved views to userViews. This will see that userViews is empty and fill with savedViews.
 			userData.userSettings 	= r.userSettings || {};
 			userData.storageVersion = r.storageVersion || null;
+			
+			if(userData.storageVersion === "null")
+			{
+			    console.log("well that was a mistake");
+			    userData.storageVersion = null;
+			}
 
             //TODO: remove the old views in a later storage version. ie get rid of variable savedViews.
 
@@ -112,11 +121,14 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     /*TODO: Remove this or fix it... right now it is wasted logic to do nothing*/
     function checkForUpgrade(callback)
     {
+        debugger;
     	var fromVersionNumber;
+    	console.info("Extension Version: " + currentVersion);
         console.info("Previous storage version: " + userData.storageVersion);
 
-        while(userData.storageVersion != currentVersion)
+        while(userData.storageVersion != currentVersion && infiniteLoopCount++ < infiniteLoopBlock)
         {
+            console.log("processing upgrade from:" + userData.storageVersion);
         	fromVersionNumber = userData.storageVersion;
             console.log('Stored Data version mismatch detected.');
             switch(fromVersionNumber) //This becomes the from version
@@ -125,20 +137,17 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     //If its a new user, they can shortcut to the latest version.
                     if(userData.userViews.length == 0 && isEmpty(userData.userSettings))
                     {
-                    	console.log('New installation detected. Will add missing settings and set to latest version.')
-                    	addMissingSettings();
-	        			fromVersionNumber =  versionTree[versionTree.length - 2].version; //I dont like it, but this will let the default to next version take place
-                    	break;
+                        fromVersionNumber = versionTree[0].version;
+                    	console.info('No version number and no saved settings. Assuming version ' + fromVersionNumber + ' being upgraded.');
+                    	//In this case we should find a way like below to jump to the latest version so they dont have to go hrough whole thing.
+                    	//addMissingSettings();
+	        			//fromVersionNumber =  versionTree[versionTree.length - 3].version; //I dont like it, but this will let the default to next version take place
                     }
                     else
                     {
-                    	//Intentionally no break. null indicates its from the before time(before I was adding version numbers.)
+                        fromVersionNumber =  versionTree[1].version; //They had saved data, so this cant be first release.
+                        console.info('No version number, but saved settings detected. Assuming version ' + fromVersionNumber + ' being upgraded.');
                     }
-                case "1.0.1.0":
-                	console.log("Upgrading from either initial two releases.");
-		            //The only thing that needs to be done is upgrade the version number since we didnt store it.
-		            //and to trigger next upgrade
-                    //Technically we will never see this, we didnt version storage this early.
                     break;
                 case "1.0.2.0":
                     //Technically we will never see this, we didnt version storage this early.

@@ -16,7 +16,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 var IPP;
 if(!IPP){ IPP = {} };
 if(!IPP.Injected){ IPP.Injected = {} };
@@ -38,8 +37,8 @@ if(!IPP.Injected){ IPP.Injected = {} };
         signatures.chatCreation     = /[a-zA-Z_$]+\.[a-zA-Z_$]+\s*=\s*new\s+[a-zA-Z_$]+\([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+,\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\),\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\.[a-zA-Z_$]+\(\)/;
         //duplicate above except more paren... so shoudl replace.
         signatures.chatlog          = /([a-zA-Z$_]+\.[a-zA-Z$_]+)\s*=\s*new\s+[a-zA-Z$_]+\([a-zA-Z$_]+\.[a-zA-Z$_]+\(\)\.[a-zA-Z$_]+,\s*[a-zA-Z$_]+\.[a-zA-Z$_]+\),\s*[a-zA-Z$_]+\.[a-zA-Z$_]+\.[a-zA-Z$_]+\(\)/;
-        signatures.defaultChat      = /this\.([a-zA-Z$_]+)\s*=\s*"all"/;
-        signatures.dashboardConst   = /([\s\S]+ZOOM_LEVEL\s*=\s*)([a-zA-Z_$]+)(;[\s\S]+new\s+google\.maps\.LatLng)(\([a-zA-Z_$]+,\s*[a-zA-Z_$]+\);)([\s\S]+)/g;
+        signatures.defaultChat      = /this\.([a-zA-Z$_]+)\s*=\s*"faction"/;
+        signatures.dashboardConst   = /([\s\S]+zoom\s*:\s*)([a-zA-Z_$]+)(,[\s\S]+new\s+google\.maps\.LatLng)(\([a-zA-Z_$]+,\s*[a-zA-Z_$]+\);)([\s\S]+)/g
         signatures.defaultMapLocation  = /[a-zA-Z_$]+\(MAP_PARAMS\).+/;
     var replacedFunctions = {};
     var userData = { userSettings: null
@@ -129,13 +128,13 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
     function setUpKnownHooks()
     {
-        hooks.getMap            = function(){return (W.d().o); }
+        hooks.getMap            = function(){return (V.e().p); }
         hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(Pd(name)) };
-        hooks.dashboardConstructor = Jf;
+        hooks.valueFromCookie   = function(name){ return(Ld(name)) };
+        hooks.dashboardConstructor = ig;
     }
 
     function identifyHooks()
@@ -190,7 +189,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         //IF we recognize it
         if(transientData.compatibility == "compatible")
         {
-            if(userData.userSettings.comm_default_chat_tab != "all")
+            if(userData.userSettings.comm_default_chat_tab != "faction")
             {
                 var commConst = findFunctionContaining2(signatures.defaultChat); //Re
                 var ChatModeVar = commConst.funcPointer.toString().match(signatures.defaultChat)[1]; //k
@@ -200,7 +199,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //visually fix
                     newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
 
-                replaceInFunction("Jf",commVar[0],commVar[0]+newLine);
+                replaceInFunction("ig",commVar[0],commVar[0]+newLine);
             }
 
 
@@ -224,8 +223,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
                 //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
-                //var matches = signatures.dashboardConst.exec(hooks.dashboardConstructor.toString());
-                var matches = signatures.dashboardConst.exec(Jf.toString());
+                var matches = signatures.dashboardConst.exec(ig.toString());
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
                 //  matches[2] - zoomLevel variable
@@ -238,18 +236,18 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 if(transientData.userLocation.status == "known" && ((state == "fresh" && userData.userSettings.auto_load_fresh == "geo") || (state == "newPage" && userData.userSettings.auto_load_page == "geo")))
                 {
                     console.info('Using geolocation for map');
-                    replaceZoom = userData.userSettings.auto_load_geo_zoom + ";";
+                    replaceZoom = userData.userSettings.auto_load_geo_zoom;
                     replaceLatLng = "(" + transientData.userLocation.latitude + "," + transientData.userLocation.longitude + ");"
                 }
                 else if(defaultView != null && ((state == "fresh" && userData.userSettings.auto_load_fresh == "saved") || (state == "newPage" && userData.userSettings.auto_load_page == "saved")))
                 {
                     console.info('Using saved view for map');
-                    replaceZoom = defaultView.zoomLevel + ";";
+                    replaceZoom = defaultView.zoomLevel;
                     replaceLatLng = "(" + defaultView.latitude + "," + defaultView.longitude + ");";
                 }
                 if(typeof replaceZoom !== "undefined" && typeof replaceLatLng !== "undefined")
                 {
-                    matches[2] = matches[2] + ' = ' + replaceZoom;
+                    matches[2] = '(' + matches[2] + ' = ' + replaceZoom + ')';
                     matches[4] = replaceLatLng;
                 }
 
@@ -286,7 +284,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
             var theDefVar;
             var myLine;
             var dbConst;
-            if(userData.userSettings.comm_default_chat_tab != "all")
+            if(userData.userSettings.comm_default_chat_tab != "faction")
             {
                 constFunc = findFunctionContaining2(signatures.mapConstructor); // returns bf function
                 chatLogFaction = findInFunction(constFunc.funcPointer,signatures.chatlog); //returns a.la
