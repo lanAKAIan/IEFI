@@ -19,7 +19,10 @@ var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "le
 					    {"sha1": "7c782a69b1f59dc1afeaa56bf2f5e67106c62163", "length": 23839 },
 					    {"sha1": "8d180a277784ac2032968fed2bdb33c535f8d804", "length": 27341 },
 					    {"sha1": "7a0f9cd8319f7b1f764fadcfd05b68bce6065f89", "length": 27840 },
-					    {"sha1": "c288bed0941a4d73d2319581fbecf2682f95c392", "length": 30026 } ];
+					    {"sha1": "c288bed0941a4d73d2319581fbecf2682f95c392", "length": 30026 },
+					    {"sha1": "a807091bd330268d14e1ae9ee7c2d7922ac024ff", "length": 30060 } ];
+					    
+					    
 
 /*
  * upgrade process flag implies an upgrade process is needed to get to this version, not necessarily from it to the next.
@@ -37,7 +40,8 @@ var versionTree = [  { "version": "1.0.0.0",  "compatible": dashboardHashes[0], 
 				     { "version": "1.3.2.2" , "compatible": dashboardHashes[4], upgradeProcess: false },
 				     { "version": "1.3.3.0" , "compatible": dashboardHashes[4], upgradeProcess: false },
 				     { "version": "1.3.3.8" , "compatible": dashboardHashes[5], upgradeProcess: false },
-				     { "version": "1.4.0.1" , "compatible": dashboardHashes[5], upgradeProcess: true  } ];
+				     { "version": "1.3.4.0" , "compatible": dashboardHashes[6], upgradeProcess: false },
+				     { "version": "1.4.0.1" , "compatible": dashboardHashes[6], upgradeProcess: true  } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {

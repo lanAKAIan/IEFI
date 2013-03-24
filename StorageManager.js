@@ -121,7 +121,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     /*TODO: Remove this or fix it... right now it is wasted logic to do nothing*/
     function checkForUpgrade(callback)
     {
-        debugger;
     	var fromVersionNumber;
     	console.info("Extension Version: " + currentVersion);
         console.info("Previous storage version: " + userData.storageVersion);
