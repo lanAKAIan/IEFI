@@ -134,7 +134,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
         hooks.valueFromCookie   = function(name){ return(Md(name)) };
-        hooks.dashboardConstructor = jg;
+        hooks.dashboardConstructor = kg;
     }
 
     function identifyHooks()
@@ -199,7 +199,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //visually fix
                     newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
 
-                replaceInFunction("jg",commVar[0],commVar[0]+newLine);
+                replaceInFunction("kg",commVar[0],commVar[0]+newLine);
             }
 
 
@@ -223,7 +223,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
                 //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
-                var matches = signatures.dashboardConst.exec(jg.toString());
+                var matches = signatures.dashboardConst.exec(kg.toString());
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
                 //  matches[2] - zoomLevel variable

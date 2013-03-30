@@ -79,7 +79,8 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
         "1.3.2.2",
         "1.3.3.8",
         "1.3.4.0",
-        "1.3.5.0"];
+        "1.3.5.0",
+        "1.3.6.0"];
     if(versionTree[versionTree.length] != currentVersion)
     {
         //We are going to assume this is just a new build, and add it to the tree.
