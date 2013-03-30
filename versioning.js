@@ -146,7 +146,7 @@ function retrieveDashboard(callback, dashboardURI)
             // innerText does not let the attacker inject HTML elements.
             console.log('Got something back');
             var ret = { "sha1": generateSHA1(xhr.response), 
-                        "length": xhr.getResponseHeader("Content-Length"), 
+                        "length": parseInt(xhr.getResponseHeader("Content-Length")), 
                         "status": xhr.status, 
                         "statusText": xhr.statusText,
                         "loggedIn": (xhr.getResponseHeader("Content-Type") === "application/javascript" ? true : false) }
