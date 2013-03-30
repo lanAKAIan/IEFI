@@ -267,7 +267,7 @@ function hidePII(hide, callback) {
             }
             if (userData.userSettings.screenshot_visibility_search == "hide") {
                 locus = "hiding geocode search";
-                screenshotCSS += "#geocode_search,";
+                screenshotCSS += "#geotools,";
             }
             if (userData.userSettings.screenshot_visibility_community == "hide") {
                 locus = "hiding community link";
