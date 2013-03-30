@@ -44,11 +44,11 @@ if(!IPP.Injected){ IPP.Injected = {} };
     var userData = { userSettings: null
                    , storageVersion: null
                    , userViews: null };
-    var transientData = { "userLocation": {"status": "pending",
-                                         "message": "Geolocation retrieval has not yet been attempted."},
-                          "initialized": false,
-                          "compatibility": "incompatible",
-                          "IITCDetected": false };
+    var transientData = { "userLocation": { "status": "pending"
+                                           ,"message": "Geolocation retrieval has not yet been attempted." }
+                         ,"initialized": false
+                         ,"compatibility": "incompatible"
+                         ,"IITCDetected": false };
 
     /* Responsible for storing and overriding the normal ingress initiating so we can do any customization we need first.
      * */
