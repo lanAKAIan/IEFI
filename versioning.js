@@ -21,7 +21,8 @@ var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "le
 					    {"sha1": "7a0f9cd8319f7b1f764fadcfd05b68bce6065f89", "length": 27840 },
 					    {"sha1": "c288bed0941a4d73d2319581fbecf2682f95c392", "length": 30026 },
 					    {"sha1": "a807091bd330268d14e1ae9ee7c2d7922ac024ff", "length": 30060 },
-					    {"sha1": "d358366e1c76caaf825e4bd51c843024e5a01e25", "length": 30136 } ];
+					    {"sha1": "d358366e1c76caaf825e4bd51c843024e5a01e25", "length": 30136 },
+					    {"sha1": "6521ef7e90d7e8f62db39c50c0011a0f28109531", "length": 30188 } ];
 					    
 
 /*
@@ -42,7 +43,8 @@ var versionTree = [  { "version": "1.0.0.0",  "compatible": dashboardHashes[0], 
 				     { "version": "1.3.3.8" , "compatible": dashboardHashes[5], upgradeProcess: false },
 				     { "version": "1.3.4.0" , "compatible": dashboardHashes[6], upgradeProcess: false },
 				     { "version": "1.3.5.0" , "compatible": dashboardHashes[7], upgradeProcess: false },
-				     { "version": "1.4.0.1" , "compatible": dashboardHashes[7], upgradeProcess: true  } ];
+				     { "version": "1.3.6.0" , "compatible": dashboardHashes[8], upgradeProcess: false },
+				     { "version": "1.4.0.1" , "compatible": dashboardHashes[8], upgradeProcess: true  } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {
