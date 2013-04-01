@@ -31,7 +31,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
 		signatures.nativeFunction   = /\{ \[native code\] \}/;
         signatures.redeem           = /var\s+[a-zA-Z_$]+\s*=\s*document\.getElementById\("passcode"\),\s*[a-zA-Z_$]+\s*=\s*[a-zA-Z_$]+\.value;/;
         signatures.geocode          = /document\.getElementById\("address"\)/; //Now called doGeocode
-        signatures.map_in_geocode   = /([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+)\.fitBounds\([a-zA-Z_$]+\)/;
+        signatures.map_in_geocode   = /(([A-Za-z0-9_$]+)(.([A-Za-z0-9_$]+))*)\.fitBounds\([A-Za-z0-9_$\[\]\.]+\)/;
         signatures.cookieParser     = /return\s+[a-zA-Z_$]+\("ingress\.intelmap\."\s*\+\s*[a-zA-Z_$]+\)/;
         signatures.mapConstructor   = /([a-zA-Z_$]+\.[a-zA-Z_$]+)\s*=\s*new\s+google\.maps\.Map\(document\.getElementById\("map_canvas"\)\,\s*[a-zA-Z_$]+\);/;
         signatures.chatCreation     = /[a-zA-Z_$]+\.[a-zA-Z_$]+\s*=\s*new\s+[a-zA-Z_$]+\([a-zA-Z_$]+\.[a-zA-Z_$]+\(\)\.[a-zA-Z_$]+,\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\),\s*[a-zA-Z_$]+\.[a-zA-Z_$]+\.[a-zA-Z_$]+\(\)/;
@@ -139,26 +139,40 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
     function identifyHooks()
     {
-        var scriptCode = "";
-        var geoFunc = findFunctionContaining(signatures.geocode);
-        var mapRef = findInFunction(geoFunc, signatures.map_in_geocode);
-        scriptCode += "IPP.Injected.hooks.getMap = function(){return ("+mapRef+"); };";
-        var cookieFunc = findFunctionContaining(signatures.cookieParser);
-        scriptCode += "\nIPP.Injected.hooks.valueFromCookie = function(name){return ("+cookieFunc+"(name)); };";
-        var dashConst = findFunctionContaining(signatures.mapConstructor);
-        scriptCode += "\nIPP.Injected.hooks.dashboardConstructor = "+dashConst+";";
-
-        var script = document.createElement('script');
-        script.setAttribute("type", "text/javascript");
-        script.setAttribute("async", true);
-        script.appendChild(document.createTextNode(scriptCode));
-        head.appendChild(script);
-
-        //For the moment we are going to assume that since there are google Maps api calls, they will keep their names.
-        hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
-        hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
-        hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
-        hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
+        try
+        {
+            var locus = "identifyHooks - start";
+            var scriptCode = "";
+            locus = "identifyHooks - findGeoFunc";
+            var geoFunc = findFunctionContaining(signatures.geocode);
+            locus = "identifyHooks - find mapRef";
+            var mapRef = findInFunction(geoFunc, signatures.map_in_geocode);
+            scriptCode += "IPP.Injected.hooks.getMap = function(){return ("+mapRef+"); };";
+            locus = "identifyHooks - findCookieParser";
+            var cookieFunc = findFunctionContaining(signatures.cookieParser);
+            scriptCode += "\nIPP.Injected.hooks.valueFromCookie = function(name){return ("+cookieFunc+"(name)); };";
+            locus = "identifyHooks - find Dashboard constructor";
+            var dashConst = findFunctionContaining(signatures.mapConstructor);
+            scriptCode += "\nIPP.Injected.hooks.dashboardConstructor = "+dashConst+";";
+    
+            locus = "identifyHooks - injecting found hooks.";
+            var script = document.createElement('script');
+            script.setAttribute("type", "text/javascript");
+            script.setAttribute("async", true);
+            script.appendChild(document.createTextNode(scriptCode));
+            head.appendChild(script);
+    
+            locus = "identifyHooks - adding additional map hooks.";
+            //For the moment we are going to assume that since there are google Maps api calls, they will keep their names.
+            hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
+            hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
+            hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
+            hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
+        }
+        catch(e)
+        {
+            console.error('Problem in identifyHooks @ ' + locus + '\n' + e.message);
+        }
 
     }
 
