@@ -69,7 +69,7 @@ var dashboardHashes = { "759f4a6f0401791573bbe2720240b9cb31e7bf72": { "knownComp
                         "c288bed0941a4d73d2319581fbecf2682f95c392": { "knownCompatableVersions": [ "1.3.3.8" ], "length": 30026 },
                         "a807091bd330268d14e1ae9ee7c2d7922ac024ff": { "knownCompatableVersions": [ "1.3.4.0" ], "length": 30060 }, 
                         "d358366e1c76caaf825e4bd51c843024e5a01e25": { "knownCompatableVersions": [ "1.3.5.0" ], "length": 30136 }, 
-                        "6521ef7e90d7e8f62db39c50c0011a0f28109531": { "knownCompatableVersions": [ "1.3.6.0", eVersionInfo.versionString ], "length": 30188 }
+                        "6521ef7e90d7e8f62db39c50c0011a0f28109531": { "knownCompatableVersions": [ "1.3.6.0", "1.3.7.0", eVersionInfo.versionString ], "length": 30188 }
 };
 
 //OK so we really need to centralize all this... and put it in one place.
