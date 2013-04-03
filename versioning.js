@@ -38,12 +38,15 @@ var versionTree = [ { "version": "1.0.0.0",  "compatible": dashboardHashes[0], u
 				   ,{ "version": "1.2.3.0" , "compatible": dashboardHashes[3], upgradeProcess: false }
 				   ,{ "version": "1.3.0.9" , "compatible": dashboardHashes[3], upgradeProcess: true  }
 				   ,{ "version": "1.3.1.0" , "compatible": dashboardHashes[3], upgradeProcess: false }
+				   ,{ "version": "1.3.2.0" , "compatible": dashboardHashes[4], upgradeProcess: false }
+				   ,{ "version": "1.3.2.1" , "compatible": dashboardHashes[4], upgradeProcess: false }
 				   ,{ "version": "1.3.2.2" , "compatible": dashboardHashes[4], upgradeProcess: false }
 				   ,{ "version": "1.3.3.0" , "compatible": dashboardHashes[4], upgradeProcess: false }
 				   ,{ "version": "1.3.3.8" , "compatible": dashboardHashes[5], upgradeProcess: false }
 				   ,{ "version": "1.3.4.0" , "compatible": dashboardHashes[6], upgradeProcess: false }
 				   ,{ "version": "1.3.5.0" , "compatible": dashboardHashes[7], upgradeProcess: false }
 				   ,{ "version": "1.3.6.0" , "compatible": dashboardHashes[8], upgradeProcess: false }
+				   ,{ "version": "1.3.7.0" , "compatible": dashboardHashes[8], upgradeProcess: false }
 				   ,{ "version": "1.4.0.1" , "compatible": dashboardHashes[8], upgradeProcess: true  } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
