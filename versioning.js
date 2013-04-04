@@ -1,6 +1,20 @@
-/**
- * This is a replacement for the current versioning issues.
- * Idea is to fix the need to update versions in multiple places
+/* @license
+ Intelligence Enhancer for Ingress - enhanced features for Google's Ingress
+ Copyright (C) 2013  Ian Scott Friedman
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 //TODO: Find a way to incorporate upgrade process into this... or at least the checks and know which version to go to.
@@ -78,6 +92,7 @@ function isDashboardCompatible(sha1, callback)
 
 /**
  *Pass in a version string... returns an object for the next version. 
+ * TODO: What hapens if we messed up and send in an unknown version.
  */
 function getNextVersion(fromVersion)
 {
@@ -226,7 +241,8 @@ function retrieveDashboard(callback, dashboardURI)
 }
 
 /**
- * Checks the version of the dashboard against the known versions, and their know compatible extension versions. Passes information to the callback function
+ * Checks the version of the dashboard against the known versions, and their known compatible extension versions. 
+ * Passes information to the callback function
  * @param {function} callback function to be passed the compatibility object.
  * @param {object=} opt_CompatibilityReturn object that will be set to the compatibility as detected.
  */
