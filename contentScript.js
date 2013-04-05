@@ -29,6 +29,9 @@ var transientData = { "userLocation": { "status": "pending",
                       "compatibility": "incompatible",
                       "IITCDetected": false };
 
+//TODO: While this fixes the immediate issue, determine if chrome prerendered the page and never actually displays it, are we leaking memory?
+var initSent = false; //This is a flag that is used to work around page being prerendered and background page not being able to talk to it.
+
 /**
  * checks to see if we are logged into the intel site. That way we don't get undefined errors.
  * NOTE: we may want to look for a specific element on the page like the login info box, but some userscript might remove it for who knows what.
@@ -210,10 +213,28 @@ document.addEventListener("INITIALIZE", handleInjectInitRequest, false);
  */
 function handleInjectInitRequest()
 {
+    console.info('CS handle InjectInitRequest detected page to be %s.', document.webkitVisibilityState );
     //We should request the compatibility... and the userdata etc.
-    chrome.extension.sendMessage({message:"NEW-INITIALIZE-EVENT", dashboardURI: getDashboardURI()}, function (response) {
-        console.log('Content Script got a notification to initialize.');
-    });
+    
+    if(document.webkitVisibilityState === "prerender")
+    {
+        //we need to wait before we send a message, because the backgroudn page cant send one back.
+        console.info('we are waiting to send the init message to background page till we are visible.');
+    }
+    else
+    {
+        sendInitEvent();
+    }
+}
+
+function sendInitEvent()
+{
+    initSent = true;
+    chrome.extension.sendMessage( {message:"NEW-INITIALIZE-EVENT", 
+                                   dashboardURI: getDashboardURI()}, 
+                                   function (response) {
+                                    console.log('Content Script got a notification to initialize.');
+                                   } );
 }
 
 document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);
@@ -429,14 +450,21 @@ function handleVisibilityChange() {
         });
 
         //chrome.extension.sendMessage({message:"GET_USER_SETTINGS"}, function (response) { });
-
-        chrome.extension.sendMessage({message:"GET_ALL_USER_DATA"}, function (response) {
-            //console.log('Content Script got a notification to initialize.');
-            userData = response.userData;
-            // create and dispatch the event
-            var event = new CustomEvent("IPP-UPDATE_USER_DATA", {"detail": userData });
-            document.dispatchEvent(event);
-        });
+        
+        if(initSent)
+        {
+            chrome.extension.sendMessage({message:"GET_ALL_USER_DATA"}, function (response) {
+                //console.log('Content Script got a notification to initialize.');
+                userData = response.userData;
+                // create and dispatch the event
+                var event = new CustomEvent("IPP-UPDATE_USER_DATA", {"detail": userData });
+                document.dispatchEvent(event);
+            });
+        }
+        else
+        {
+            sendInitEvent();
+        }
     }
 }
 
