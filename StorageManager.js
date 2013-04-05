@@ -202,6 +202,15 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 		            addGUIDsToViews();
                     break;
                 case "1.3.2.2":
+                    addMissingSettings();
+                    break;
+                case "1.3.2.2":
+                    addMissingSettings(); //
+                    break;
+                case "1.4.0.1":
+                    addMissingSettings(); //
+                    break;
+                case "1.4.0.30":
                     addMissingSettings(); //
                     break;
                 default:

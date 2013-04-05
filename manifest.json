@@ -1,6 +1,6 @@
 {
   "name": "Intelligence Enhancer for Ingress",
-  "version": "1.4.0.1",
+  "version": "1.4.0.30",
   "manifest_version": 2,
   "description": "Provides enhanced functionality to the ingress.com/intel site.",
   "page_action": {
