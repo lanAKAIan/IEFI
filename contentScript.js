@@ -308,12 +308,12 @@ function hidePII(hide, callback) {
             }
             if (userData.userSettings.screenshot_visibility_controls == "hide") {
                 locus = "hiding map controls";
-                screenshotCSS += '.gmnoprint:not([style*="z-index: 1000001;"]),'; //So this currently hides the google copyright so it should not be used we need to keep [z-index=1000001] could maybe jsut add
+                screenshotCSS += '.gmnoprint:not([style*="z-index: 1000001;"]),#snapcontrol,'; //Specifically keep Google cpoyright
             }
             if (userData.userSettings.screenshot_visibility_clutter == "hide") {
                 locus = "hiding other clutter";
                 //screenshotCSS += "#nav,#header_links,#header_links_box,#header_invites,#header_invites_box,";
-                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,";
+                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,#header_maplink,";
             }
             //now that we have what we want to apply, lets add the style. replace last ,. need to deal with empty
             screenshotCSS = screenshotCSS.replace(/,$/, '{visibility: hidden;}')
