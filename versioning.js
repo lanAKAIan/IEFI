@@ -63,7 +63,7 @@ var versionTree = [ { "version": "1.0.0.0",  "compatible": dashboardHashes[0], u
 				   ,{ "version": "1.3.7.0" , "compatible": dashboardHashes[8], upgradeProcess: false }
 				   ,{ "version": "1.4.0.1" , "compatible": dashboardHashes[8], upgradeProcess: true  }
 				   ,{ "version": "1.4.0.30", "compatible": dashboardHashes[8], upgradeProcess: true  }
-				   ,{ "version": "1.4.0.32", "compatible": dashboardHashes[8], upgradeProcess: false } ];
+				   ,{ "version": "1.4.0.33", "compatible": dashboardHashes[8], upgradeProcess: false } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {

@@ -229,12 +229,19 @@ function handleInjectInitRequest()
 
 function sendInitEvent()
 {
-    initSent = true;
-    chrome.extension.sendMessage( {message:"NEW-INITIALIZE-EVENT", 
-                                   dashboardURI: getDashboardURI()}, 
-                                   function (response) {
-                                    console.log('Content Script got a notification to initialize.');
-                                   } );
+    if(!initSent)
+    {
+        initSent = true;
+        chrome.extension.sendMessage( {message:"NEW-INITIALIZE-EVENT", 
+                                       dashboardURI: getDashboardURI()}, 
+                                       function (response) {
+                                        console.log('Content Script got a notification to initialize.');
+                                       } );
+    }
+    else
+    {
+        console.warn('Blocked double sendInitEvent request in contentScript.');
+    }
 }
 
 document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);

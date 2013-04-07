@@ -45,12 +45,13 @@ function installOrUpdate(install_details){
 			{
 				for(var i = 0; i < tabResults.length; i++)
 				{
-				    console.log('install or update calling showPageActionIfLoggedIn on tabId ' + tabResults[i].id);
+				    var currentTab = tabResults[i].id;
+				    console.log('install or update calling showPageActionIfLoggedIn on tabId ' + currentTab);
 				    //We need the content script to be there in order to do anything...
-				    chrome.tabs.executeScript( tabResults[i].id, 
+				    chrome.tabs.executeScript( currentTab, 
 				                              { file: "contentScript.js"
 				                               ,runAt: "document_idle"}
-				                               ,function(){ showPageActionIfLoggedIn(tabResults[i].id) } );
+				                               ,function(){ showPageActionIfLoggedIn(currentTab) } );
 				    //TODO: need to try and remove old script.
 				                               
 
