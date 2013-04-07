@@ -205,13 +205,13 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     addMissingSettings();
                     break;
                 case "1.3.2.2":
-                    addMissingSettings(); //
+                    addMissingSettings();
                     break;
                 case "1.4.0.1":
-                    addMissingSettings(); //
+                    addMissingSettings();
                     break;
                 case "1.4.0.30":
-                    addMissingSettings(); //
+                    addMissingSettings();
                     break;
                 default:
                     //So ideally when we go in later with a version that doesnt need an upgrade, it will fall through to this.
