@@ -26,11 +26,10 @@
 function installOrUpdate(install_details){
 	switch (install_details.reason){
 		case "install": 
-						//console.log('it is a new install');
+						console.log('it is a new install');
 						break;
 		case "update": 
-			//console.log('its an update');
-			//console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version);
+			console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version);
             notifyUserOfUpdate();
 			break;
 		case "chrome_update": //do nothing we dont care for the moment. but this is basically if the actual version of chrome itself updates.
@@ -46,8 +45,15 @@ function installOrUpdate(install_details){
 			{
 				for(var i = 0; i < tabResults.length; i++)
 				{
-					//console.log('install or update calling showPageActionIfLoggedIn on tabId ' + tabResults[i].id);
-					showPageActionIfLoggedIn(tabResults[i].id)
+				    console.log('install or update calling showPageActionIfLoggedIn on tabId ' + tabResults[i].id);
+				    //We need the content script to be there in order to do anything...
+				    chrome.tabs.executeScript( tabResults[i].id, 
+				                              { file: "contentScript.js"
+				                               ,runAt: "document_idle"}
+				                               ,function(){ showPageActionIfLoggedIn(tabResults[i].id) } );
+				    //TODO: need to try and remove old script.
+				                               
+
 				}
 			}
 		});
