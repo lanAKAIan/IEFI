@@ -221,18 +221,24 @@ function generateGoogleMapsLink(view, callback)
 
 function notifyUserOfUpdate()
 {
-    var msg = "Click here to view the changelog.";
-    var img = "res/icon-48.png";
-    var title = "Intelligence Enhancer Updated to " + chrome.runtime.getManifest().version;
-    var notify = generateTOAST(img,title, msg);
-        notify.addEventListener(  'click', function(){displayChangelog();notify.cancel()});
-        var closein10 = function()
-        {
-            setTimeout(function(){notify.cancel()}, 10000);
-        }
-        notify.addEventListener( 'show', closein10);
-        notify.show();
-
+    if(IPP.StorageManager.getUserSettings().extension_updated_notification === "on")
+    {
+        var msg = "Click here to view the changelog.";
+        var img = "res/icon-48.png";
+        var title = "Intelligence Enhancer Updated to " + chrome.runtime.getManifest().version;
+        var notify = generateTOAST(img,title, msg);
+            notify.addEventListener(  'click', function(){displayChangelog();notify.cancel()});
+            var closein10 = function()
+            {
+                setTimeout(function(){notify.cancel()}, 10000);
+            }
+            notify.addEventListener( 'show', closein10);
+            notify.show();
+    }
+    else
+    {
+        console.info('Version updated but notification blocked by user setting.');
+    }
 }
 
 function displayChangelog()

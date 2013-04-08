@@ -62,6 +62,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                             , "auto_load_view":                 null
 							, "redeem_passcode_cleanse": 		"on"
 							, "nonselectable_spinner":          "on"
+							, "extension_updated_notification": "on"
 							, "iitc_incompatibility_warn":      "on"
 							, "dashboard_incompatibility_warn": "on" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
