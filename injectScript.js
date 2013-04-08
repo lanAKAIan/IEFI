@@ -78,6 +78,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         document.addEventListener("IPP-INITIALIZED", function(e){
             userData = e.detail.userData;
             transientData = e.detail.transientData;
+            
             //compatible = (e.detail.compatibility.compatibility=="compatible");
             console.log('DETECTED IPP-INITIALIZED EVENT');
             if(typeof ingressInit !== null && transientData.initialized == false)

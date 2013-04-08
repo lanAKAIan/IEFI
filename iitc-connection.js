@@ -45,6 +45,15 @@ var setup =  function() {
   document.dispatchEvent(event);
   console.log('TOTAL-CONV-DETECT');
   
+  try
+  {
+        IPP.Injected.setTotallyConverted(true);
+  }
+  catch(e)
+  {
+      console.error('Problem setting total conversions status in content script from IITC plugin.');
+  }
+  
   //TODO: set up alternate hooks here instead of in inject script.  
 }
 
