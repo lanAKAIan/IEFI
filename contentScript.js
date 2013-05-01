@@ -26,7 +26,11 @@ var userData = { userSettings: null
 var transientData = { "userLocation": { "status": "pending",
                                         "message": "Geolocation retrieval has not yet been attempted."},
                       "initialized": false,
-                      "compatibility": "incompatible" };
+                      "compatibility": "incompatible",
+                      "IITCDetected": false };
+
+//TODO: While this fixes the immediate issue, determine if chrome prerendered the page and never actually displays it, are we leaking memory?
+var initSent = false; //This is a flag that is used to work around page being prerendered and background page not being able to talk to it.
 
 /**
  * checks to see if we are logged into the intel site. That way we don't get undefined errors.
@@ -91,6 +95,13 @@ var script = document.createElement('script');
     script.setAttribute("type", "text/javascript");
     script.setAttribute("async", true);
     script.setAttribute("src", chrome.extension.getURL("injectScript.js"));
+    head.insertBefore(script, head.firstChild);
+    
+//Now adding in IITC plugin    
+    script = document.createElement('script');
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("async", true);
+    script.setAttribute("src", chrome.extension.getURL("iitc-connection.js"));
     head.insertBefore(script, head.firstChild);
 
 /**
@@ -187,6 +198,8 @@ chrome.extension.onMessage.addListener(
                 // create and dispatch the event
                 var event = new CustomEvent("IPP-INITIALIZED", {"detail": initData });
                 document.dispatchEvent(event);
+                
+                fixSelectables();
             }
             requestUserLocation(initInjected);
 
@@ -200,10 +213,35 @@ document.addEventListener("INITIALIZE", handleInjectInitRequest, false);
  */
 function handleInjectInitRequest()
 {
+    console.info('CS handle InjectInitRequest detected page to be %s.', document.webkitVisibilityState );
     //We should request the compatibility... and the userdata etc.
-    chrome.extension.sendMessage({message:"NEW-INITIALIZE-EVENT", dashboardURI: getDashboardURI()}, function (response) {
-        console.log('Content Script got a notification to initialize.');
-    });
+    
+    if(document.webkitVisibilityState === "prerender")
+    {
+        //we need to wait before we send a message, because the backgroudn page cant send one back.
+        console.info('we are waiting to send the init message to background page till we are visible.');
+    }
+    else
+    {
+        sendInitEvent();
+    }
+}
+
+function sendInitEvent()
+{
+    if(!initSent)
+    {
+        initSent = true;
+        chrome.extension.sendMessage( {message:"NEW-INITIALIZE-EVENT", 
+                                       dashboardURI: getDashboardURI()}, 
+                                       function (response) {
+                                        console.log('Content Script got a notification to initialize.');
+                                       } );
+    }
+    else
+    {
+        console.warn('Blocked double sendInitEvent request in contentScript.');
+    }
 }
 
 document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);
@@ -213,6 +251,7 @@ document.addEventListener("TOTAL-CONV-DETECT", notifyTotalConversion, false);
 function notifyTotalConversion()
 {
     //We should request the compatibility... and the userdata etc.
+    transientData.IITCDetected = true;
     chrome.extension.sendMessage({message:"TOTAL-CONVERSION-DETECTED"}, function (response) {
         console.log('Content Script got a notification that it was in totalConversion.');
     });
@@ -256,7 +295,7 @@ function hidePII(hide, callback) {
             }
             if (userData.userSettings.screenshot_visibility_search == "hide") {
                 locus = "hiding geocode search";
-                screenshotCSS += "#geocode_search,";
+                screenshotCSS += "#geotools,";
             }
             if (userData.userSettings.screenshot_visibility_community == "hide") {
                 locus = "hiding community link";
@@ -276,12 +315,12 @@ function hidePII(hide, callback) {
             }
             if (userData.userSettings.screenshot_visibility_controls == "hide") {
                 locus = "hiding map controls";
-                screenshotCSS += '.gmnoprint:not([style*="z-index: 1000001;"]),'; //So this currently hides the google copyright so it should not be used we need to keep [z-index=1000001] could maybe jsut add
+                screenshotCSS += '.gmnoprint:not([style*="z-index: 1000001;"]),#snapcontrol,'; //Specifically keep Google cpoyright
             }
             if (userData.userSettings.screenshot_visibility_clutter == "hide") {
                 locus = "hiding other clutter";
                 //screenshotCSS += "#nav,#header_links,#header_links_box,#header_invites,#header_invites_box,";
-                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,";
+                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,#header_maplink,";
             }
             //now that we have what we want to apply, lets add the style. replace last ,. need to deal with empty
             screenshotCSS = screenshotCSS.replace(/,$/, '{visibility: hidden;}')
@@ -321,6 +360,33 @@ function hidePII(hide, callback) {
 
     } catch (e) {
         console.error('There was a problem changing the visibility of Ingress Components: \n' + locus + '\n' + e.message);
+    }
+}
+
+var selectablesStyle;
+function fixSelectables() {
+    var locus = "";
+
+    var selectableCSS = ""; //fill it out then append
+    try {
+        console.log('im going in');
+            if (userData.userSettings.nonselectable_spinner === "on") {
+                locus = "Making Loading... less annoying.";
+                selectableCSS += "#map_spinner {pointer-events: none;}";
+                console.log('selectableCSS: ' + selectableCSS);
+                selectablesStyle = document.createElement('style');
+                selectablesStyle.setAttribute("type", "text/css");
+                selectablesStyle.appendChild(document.createTextNode(selectableCSS));
+                head.appendChild(selectablesStyle);
+                console.log('sent append style');
+            }
+            else if(typeof selectablesStyle !== "undefined")
+            {
+                document.removeChild(selectablesStyle);
+            }
+
+    } catch (e) {
+        console.error('There was a problem making loading... unselectable: \n' + locus + '\n' + e.message);
     }
 }
 
@@ -382,12 +448,6 @@ function requestUserLocation(callback){
     }
 }
 
-/*Attempts to determine if ingress total conversion is all up in the page.*/
-function totallyConverted()
-{
-    return (document.querySelector('[src*=total-conversion]') ? true : false);
-}
-
 //This sections is to handle when we want to display the pageAction icon
 function handleVisibilityChange() {
     if (!document.webkitHidden) {
@@ -397,14 +457,21 @@ function handleVisibilityChange() {
         });
 
         //chrome.extension.sendMessage({message:"GET_USER_SETTINGS"}, function (response) { });
-
-        chrome.extension.sendMessage({message:"GET_ALL_USER_DATA"}, function (response) {
-            //console.log('Content Script got a notification to initialize.');
-            userData = response.userData;
-            // create and dispatch the event
-            var event = new CustomEvent("IPP-UPDATE_USER_DATA", {"detail": userData });
-            document.dispatchEvent(event);
-        });
+        
+        if(initSent)
+        {
+            chrome.extension.sendMessage({message:"GET_ALL_USER_DATA"}, function (response) {
+                //console.log('Content Script got a notification to initialize.');
+                userData = response.userData;
+                // create and dispatch the event
+                var event = new CustomEvent("IPP-UPDATE_USER_DATA", {"detail": userData });
+                document.dispatchEvent(event);
+            });
+        }
+        else
+        {
+            sendInitEvent();
+        }
     }
 }
 

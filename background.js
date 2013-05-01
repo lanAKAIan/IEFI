@@ -16,8 +16,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
-
 /**
   * installOrUpdate
   * called when the extension is updated or installed... wow.
@@ -28,11 +26,10 @@
 function installOrUpdate(install_details){
 	switch (install_details.reason){
 		case "install": 
-						//console.log('it is a new install');
+						console.log('it is a new install');
 						break;
 		case "update": 
-			//console.log('its an update');
-			//console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version);
+			console.log('it was a update from ' + install_details.previousVersion + ' to ' + chrome.runtime.getManifest().version);
             notifyUserOfUpdate();
 			break;
 		case "chrome_update": //do nothing we dont care for the moment. but this is basically if the actual version of chrome itself updates.
@@ -48,8 +45,16 @@ function installOrUpdate(install_details){
 			{
 				for(var i = 0; i < tabResults.length; i++)
 				{
-					//console.log('install or update calling showPageActionIfLoggedIn on tabId ' + tabResults[i].id);
-					showPageActionIfLoggedIn(tabResults[i].id)
+				    var currentTab = tabResults[i].id;
+				    console.log('install or update calling showPageActionIfLoggedIn on tabId ' + currentTab);
+				    //We need the content script to be there in order to do anything...
+				    chrome.tabs.executeScript( currentTab, 
+				                              { file: "contentScript.js"
+				                               ,runAt: "document_idle"}
+				                               ,function(){ showPageActionIfLoggedIn(currentTab) } );
+				    //TODO: need to try and remove old script.
+				                               
+
 				}
 			}
 		});
@@ -90,9 +95,7 @@ function getVisibleTab(callback)
 
 function getSavedViews( callback )
 {
-	//chrome.storage.sync.set({'savedViews': tempViews});
-	chrome.storage.sync.get('userViews', function(r){callback(r.userViews);});
-	//console.log('done!');
+	callback(IPP.StorageManager.getUserViews());
 }
 
 function loadView(view)
@@ -105,70 +108,63 @@ function loadView(view)
     getVisibleTab(loadV);
 }
 
-//PAss me a view object not json!
-function saveView(view)
-{
-    view.guid = getGUID();
-	//we should already have a cache so this should be fixed... anyway for now do this.
-	//1. get the views
-	//2 once we got the viwes, add the new one
-	//3. update the display or not? may be calback aded to function?
-	chrome.storage.sync.get('userViews', function(r){
-											var x;
-											if(r.userViews != undefined)
-											{
-												x = r.userViews
-											}
-											else
-											{
-												x = [];
-											}								
-											
-											//console.info('savedViews length pre add:' + x.length);
-											x[x.length] = view;
-											
-											//r[r.length] = view;
-										  chrome.storage.sync.set({"userViews": x}, function() {
-																						console.info('view added to storage');})
-																						});
+/**
+  *   @name: saveView
+  *   @description: pass a view object and this function will send it to the StorageManager for saving.
+  *   @param: view: {latitude: value, longitude: value, zoomLevel: value}
+  *   @return: NA
+  */
+function saveView(view) {
+    //Add a guid to the view since all we were passed is the plysical view information.
+        view.guid = getGUID();
+
+        var handleViews = function(viewArray) {
+            var x;
+            if (viewArray != undefined) {
+                x = viewArray
+            } else {
+                x = [];
+            }
+
+            //console.info('savedViews length pre add:' + x.length);
+            x[x.length] = view;
+            
+            var afterAdd = function(){console.info('view added to storage');};            
+            IPP.StorageManager.setUserViews(x, afterAdd);
+        }
+        getSavedViews(handleViews);
+    }
+
+function removeView(viewToRemove) {
+
+    //we shoudl already have a cache so this shoudl be fixed... anyway for now do this.
+
+    //1. get the views
+    //2 once we got the viwes, add the new one
+    //3. update the display or not? may be calback aded to function?
+    //console.log('background.js.remove view called with ' + view);
+
+    var handleViews = function(viewArray) {
+        var x = viewArray;
+        //TODO: make sure there is a viewArray to remove from.
+        for (var i = 0; i < x.length; i++) {
+            if (x[i].guid === viewToRemove.guid) {
+                //console.info('Im removing: ' + i);
+                x.splice(i, 1);
+                //remove one item at that index
+                break;
+                //break outa loop
+            }
+        }
+
+        //now we update the storage
+        var afterRemove = function() {
+            console.info('view removed from storage');
+        };
+        IPP.StorageManager.setUserViews(x, afterRemove);
+    }
+    getSavedViews(handleViews);    
 }
-
-function removeView(view)
-{
-	
-	//we shoudl already have a cache so this shoudl be fixed... anyway for now do this.
-	
-	//1. get the views
-	//2 once we got the viwes, add the new one
-	//3. update the display or not? may be calback aded to function?
-	//console.log('background.js.remove view called with ' + view);
-	chrome.storage.sync.get('userViews', function(r){
-											//console.info('savedViews length pre remove:' + r.savedViews.length);
-											var x = r.userViews;
-											var removeView = JSON.stringify(view);
-											var i=0;
-											while(i < x.length)
-											{
-												//console.info('Im at index: ' + i);
-												//splice it out if found
-												//console.info('remove view: ' + removeView);
-												//console.info('cur view[' + i + ']:' + JSON.stringify(x[i]));
-												if(JSON.stringify(x[i]) === removeView)
-												{
-													//console.info('Im removing: ' + i);
-													x.splice(i,1); //remove one item at that index
-													break; //break outa loop
-												}
-												i++;
-											}
-											//console.info('savedViews length post remove:' + r.savedViews.length);
-										  chrome.storage.sync.set({"userViews": x}, function() {
-																						console.info('view removed from storage');})
-																						});
-	
-}
-
-
 
 function getCurrentView( callback )
 {
@@ -225,18 +221,24 @@ function generateGoogleMapsLink(view, callback)
 
 function notifyUserOfUpdate()
 {
-    var msg = "Click here to view the changelog.";
-    var img = "res/icon-48.png";
-    var title = "Intelligence Enhancer Updated to " + chrome.runtime.getManifest().version;
-    var notify = generateTOAST(img,title, msg);
-        notify.addEventListener(  'click', function(){displayChangelog();notify.cancel()});
-        var closein10 = function()
-        {
-            setTimeout(function(){notify.cancel()}, 10000);
-        }
-        notify.addEventListener( 'show', closein10);
-        notify.show();
-
+    if(IPP.StorageManager.getUserSettings().extension_updated_notification === "on")
+    {
+        var msg = "Click here to view the changelog.";
+        var img = "res/icon-48.png";
+        var title = "Intelligence Enhancer Updated to " + chrome.runtime.getManifest().version;
+        var notify = generateTOAST(img,title, msg);
+            notify.addEventListener(  'click', function(){displayChangelog();notify.cancel()});
+            var closein10 = function()
+            {
+                setTimeout(function(){notify.cancel()}, 10000);
+            }
+            notify.addEventListener( 'show', closein10);
+            notify.show();
+    }
+    else
+    {
+        console.info('Version updated but notification blocked by user setting.');
+    }
 }
 
 function displayChangelog()
@@ -248,24 +250,25 @@ function displayChangelog()
 function notifyUserOfTotalConversion()
 {
         var title = "Ingress Total Conversion Detected";
-        var msg   = "Only basic functionality will be available. (screenshot, load/save views)";
+        var msg   = "Only basic functionality(screenshot, load/save views) will be available. You can disable this message permanently in the extension settings.";
         var img   = "res/icon-48.png";
         var notify = generateTOAST(img,title, msg);
         notify.addEventListener( 'click', function(){notify.cancel()});
-        var closein10 = function()
+        var closein15 = function()
         {
-            setTimeout(function(){notify.cancel()}, 10000);
+            setTimeout(function(){notify.cancel()}, 15000);
         }
-        notify.addEventListener( 'show', closein10);
+        notify.addEventListener( 'show', closein15);
         notify.show();
 }
 
 function notifyUserOfCompatibility(compat)
 {
-    if(compat.compatibility != "compatible")
+    //TODO: we dont want to keep adding this message if it is already showing
+    if(compat.compatibility !== "compatible" && compat.compatibility !== "ignore" && IPP.StorageManager.getUserSettings().dashboard_incompatibility_warn === "on")
     {
         var title = "Unknown Dashboard Version Detected";
-        var msg   = "Some functionality may not work until extension is updated. Click here to learn more.";
+        var msg   = "Some or all functionality may not work until extension is updated. Click here to learn more. You can disable this message in the extension settings.";
         var img   = "res/icon-48.png";
         var notify = generateTOAST(img,title, msg);
         notify.addEventListener( 'click', function(){displayUnknownDashboardVersion();notify.cancel()});
@@ -524,13 +527,22 @@ chrome.extension.onMessage.addListener(
         }
 
         //A new page load, so we want to check compatibility.
-        checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //checkCompatibility(compatFunc, extensionCompatibility, dashboardURI);
+        //TODO: make sure that if an error occures determining the compatibility, we dont completely kill this. and stop the page loads.
+        checkDashboardCompatibility(compatFunc, extensionCompatibility, dashboardURI)
     }
     else if (request.message == "TOTAL-CONVERSION-DETECTED")
     {
         sendResponse({farewell: "goodbye"}); //close the connection.
-
-        notifyUserOfTotalConversion();
+        if(IPP.StorageManager.getUserSettings().iitc_incompatibility_warn === "on")
+        {
+            notifyUserOfTotalConversion();
+        }
+        else
+        {
+            console.info('IITC Detected, but the user has disabled the notification.');
+        }
+        
     }
   });
 

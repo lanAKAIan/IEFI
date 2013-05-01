@@ -16,7 +16,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 //Utilities.js
 
 //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
@@ -46,7 +45,6 @@ function convertDataURIToBlob(dataURI, mimetype) {
     return newBlob;
 }
 
-
 //http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
@@ -58,4 +56,19 @@ function str2ab(str) {
         bufView[i] = str.charCodeAt(i);
     }
     return buf;
+}
+
+/**
+ * Checks to see if any keys have been initialized in an object.
+ * @param {Object} obj the object you want to check is not empty.
+ */
+function isEmpty(obj)
+{
+	var retval = true;
+	for(var k in obj)
+	{
+		retval = false;
+		break;
+	}
+	return retval;
 }

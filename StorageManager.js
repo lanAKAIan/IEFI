@@ -31,6 +31,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     var saveNeeded = { userSettings: false
                      , storageVersion: false
                      , userViews: false };
+                     
+    var infiniteLoopCount = 0; /*This is here incase I mess up logic and we end up looping indefinately.*/
+    var infiniteLoopBlock = 100; /*This is here incase I mess up logic and we end up looping indefinately.*/
 	
 	var userSettings = {};
 	//So in some respect I feel this should be somewhere else. Perhaps also have the objects be part of a thing to build the options page... ie a option default value description thing.
@@ -57,38 +60,16 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                             , "auto_load_page":                 "last"
                             , "auto_load_geo_zoom":             15
                             , "auto_load_view":                 null
-							, "redeem_passcode_cleanse": 		"on" };
+							, "redeem_passcode_cleanse": 		"on"
+							, "nonselectable_spinner":          "on"
+							, "extension_updated_notification": "on"
+							, "iitc_incompatibility_warn":      "on"
+							, "dashboard_incompatibility_warn": "on" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
 					  ,{"latitude":34.28040735750082,"longitude":-119.29248599212644,"viewName":"Downtown Ventura","zoomLevel":16}
-					  ,{"latitude":37.76016278842576,"longitude":-122.43828664550784,"viewName":"San Francisco","zoomLevel":12}];
-    var currentVersion = chrome.runtime.getManifest().version;
-    //Uses in the upgrade process.
-    var versionTree = [ null, //no version assume baseline
-        "1.0.1.0",
-        "1.0.2.0",
-        "1.1.0.30",
-        "1.2.0.6",
-        "1.2.1.0",
-        "1.2.2.0",
-        "1.2.3.0",
-        "1.3.0.6",
-        "1.3.0.7",
-        "1.3.0.8",
-        "1.3.2.2",
-        "1.3.3.8",
-        "1.3.4.0",
-        "1.3.5.0",
-        "1.3.6.0",
-        "1.3.7.0"];
-    if(versionTree[versionTree.length] != currentVersion)
-    {
-        //We are going to assume this is just a new build, and add it to the tree.
-        //currentVersion ensures we always update the version even if no upgrade needed
-        versionTree[versionTree.length] = currentVersion;
-    }
-	
+					  ,{"latitude":37.76016278842576,"longitude":-122.43828664550784,"viewName":"San Francisco","zoomLevel":12}];	
 	var toLoad = {};
 	
 	//Load up the settings from the chrome storage
@@ -99,6 +80,12 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 			userData.userViews 		= r.userViews || r.savedViews || []; //For 1.3 we are renaming saved views to userViews. This will see that userViews is empty and fill with savedViews.
 			userData.userSettings 	= r.userSettings || {};
 			userData.storageVersion = r.storageVersion || null;
+			
+			if(userData.storageVersion === "null")
+			{
+			    console.log("well that was a mistake");
+			    userData.storageVersion = null;
+			}
 
             //TODO: remove the old views in a later storage version. ie get rid of variable savedViews.
 
@@ -135,49 +122,119 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     /*TODO: Remove this or fix it... right now it is wasted logic to do nothing*/
     function checkForUpgrade(callback)
     {
+    	var fromVersionNumber;
+    	console.info("Extension Version: " + currentVersion);
         console.info("Previous storage version: " + userData.storageVersion);
 
-        //vhange to while
-        while(userData.storageVersion != currentVersion)
+        while(userData.storageVersion != currentVersion && infiniteLoopCount++ < infiniteLoopBlock)
         {
+            console.log("processing upgrade from:" + userData.storageVersion);
+        	fromVersionNumber = userData.storageVersion;
             console.log('Stored Data version mismatch detected.');
-            switch(userData.storageVersion) //This becomes the from version
+            switch(fromVersionNumber) //This becomes the from version
             {
                 case null:
-                    //Intentionally no break. null indicates its from the before time(before I was adding version numbers.)
-                case "1.0.1.0":
-                    //Technically we will never see this, we didnt version storage this early.
-                    upgrade(userData.storageVersion);
+                    //If its a new user, they can shortcut to the latest version.
+                    if(userData.userViews.length == 0 && isEmpty(userData.userSettings))
+                    {
+                        fromVersionNumber = versionTree[0].version;
+                    	console.info('No version number and no saved settings. Assuming version ' + fromVersionNumber + ' being upgraded.');
+                    	//In this case we should find a way like below to jump to the latest version so they dont have to go hrough whole thing.
+                    	//addMissingSettings();
+	        			//fromVersionNumber =  versionTree[versionTree.length - 3].version; //I dont like it, but this will let the default to next version take place
+                    }
+                    else
+                    {
+                        fromVersionNumber =  versionTree[1].version; //They had saved data, so this cant be first release.
+                        console.info('No version number, but saved settings detected. Assuming version ' + fromVersionNumber + ' being upgraded.');
+                    }
                     break;
                 case "1.0.2.0":
                     //Technically we will never see this, we didnt version storage this early.
-                    upgrade(userData.storageVersion);
+                    addMissingSettings();
                     break;
                 case "1.0.3.0":
                     //Not sure we ever released this version.
-                    upgrade(userData.storageVersion);
+                    //changing the default zoom level to 15 on the geolocation thing to show level 1 portals. since we never let them use the value, replace it.
+		            console.info('Modifying default user settings');
+		            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
+		            {
+		                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
+		                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
+		                //Some users may want this, and it was already a setting. Just changed default.
+		                //userData.userSettings.screenshot_visibility_search = "hide";
+		            }
+		            addGUIDsToViews();
+		            addMissingSettings();
                     break;
-                case "1.1.0.30":
-                    upgrade(userData.storageVersion);
-                    break;
-                case "1.2.0.6":
-                    upgrade(userData.storageVersion);
-                    break;
+                case "1.2.3.0":
+                case "1.3.0.3":
                 case "1.3.0.6":
-                    upgrade(userData.storageVersion);
-                    break;
                 case "1.3.0.7":
-                    upgrade(userData.storageVersion);
-                    break;
                 case "1.3.0.8":
-                    upgrade(userData.storageVersion);
+		            addMissingSettings(); // we can assume all the variables will at least exist then.
+		            console.info('Verifying auto-load settings')
+		            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
+		            {
+		                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
+		                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
+		                saveNeeded.userSettings = true;
+		            }
+		
+		            if(userData.userSettings.auto_load_view == "undefined") //Some beta testers had this.
+		            {
+		                console.info("Invalid auto_load_view detected, resetting to default");
+		                userData.userSettings.auto_load_view = defaultSettings["auto_load_view"];
+		
+		                if(userData.userSettings.auto_load_page === "saved")
+		                {
+		                    console.info("Resetting auto_load_page to default based on invalid view");
+		                    userData.userSettings.auto_load_page = defaultSettings["auto_load_page"];
+		                }
+		                if(userData.userSettings.auto_load_fresh === "saved")
+		                {
+		                    console.info("Resetting auto_load_fresh to default based on invalid view");
+		                    userData.userSettings.auto_load_fresh = defaultSettings["auto_load_fresh"];
+		                }
+		                saveNeeded.userSettings = true;
+		            }
+		
+		            console.info('Verifying stored views.');
+		            addGUIDsToViews();
+                    break;
+                case "1.3.2.2":
+                    addMissingSettings();
+                    break;
+                case "1.3.2.2":
+                    addMissingSettings();
+                    break;
+                case "1.4.0.1":
+                    addMissingSettings();
+                    break;
+                case "1.4.0.30":
+                    addMissingSettings();
                     break;
                 default:
                     //So ideally when we go in later with a version that doesnt need an upgrade, it will fall through to this.
-                    upgrade(userData.storageVersion);
+                    console.log('Upgrade from ' + fromVersionNumber + ' requires no storage changes.');
                     break;
             }
+            resetDashbaordIncompatibilityWarning();
+            //We know there was an upgrade and it should have been to the next version whatever that was.
+	        saveNeeded.storageVersion = true;
+	        userData.storageVersion = getNextVersion(fromVersionNumber);
+	        /* TODO: Right now if we are coming from an unknown version... or rather one not in the tree... it returns -1
+	         /        looking for it which we then add one to making it 0... which means we get null as the next version...
+	         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
+	        console.log("Upgrade from " + fromVersionNumber + " to " + userData.storageVersion + " complete.");
         }
+    }
+    
+    function resetDashbaordIncompatibilityWarning()
+    {
+        console.log('Resetting dashboard incompatability warning');
+        userData.userSettings.dashboard_incompatibility_warn = "on";
+        saveNeeded.userSettings = true;
     }
 
 
@@ -218,74 +275,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
             console.log('ERROR in renameStorage Variable @locus: ' + locus + ' \n ' + e.message);
         }
         return(success);
-    }
-
-    //Should this just be in the checkForUpgrade function? oh well.
-    ///yeah thats what we did essentially...
-    //TODO: merge with caller.
-    function upgrade(fromVersionNumber)
-    {
-        if(fromVersionNumber === "1.0.1.0")
-        {
-            console.log("Upgrading from either initial two releases.");
-            //The only thing that needs to be done is upgrade the version number since we didnt store it.
-            //and to trigger next upgrade
-        }
-        else if(fromVersionNumber === "1.0.2.0")
-        {
-            addMissingSettings();
-        }
-        else if(fromVersionNumber === "1.0.3.0")
-        {
-            //changing the default zoom level to 15 on the geolocation thing to show level 1 portals. since we never let them use the value, replace it.
-            console.info('Modifying default user settings');
-            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
-            {
-                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
-                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
-                //Some users may want this, and it was already a setting. Just changed default.
-                //userData.userSettings.screenshot_visibility_search = "hide";
-            }
-            addGUIDsToViews();
-            addMissingSettings();
-        }
-        else if(fromVersionNumber === "1.2.3.0" || fromVersionNumber === "1.3.0.3" || fromVersionNumber === "1.3.0.8") //TODO: verify version number at upload.
-        {
-            addMissingSettings(); // we can assume all the variables will at least exist then.
-            console.info('Verifying auto-load settings')
-            if(userData.userSettings.auto_load_geo_zoom != defaultSettings["auto_load_geo_zoom"])
-            {
-                console.info('Resetting default Geo Zoom to ' + defaultSettings["auto_load_geo_zoom"]);
-                userData.userSettings.auto_load_geo_zoom = defaultSettings["auto_load_geo_zoom"];
-            }
-
-            if(userData.userSettings.auto_load_view == "undefined") //Some beta testers had this.
-            {
-                console.info("Invalid auto_load_view detected, resetting to default");
-                userData.userSettings.auto_load_view = defaultSettings["auto_load_view"];
-
-                if(userData.userSettings.auto_load_page === "saved")
-                {
-                    console.info("Resetting auto_load_page to default based on invalid view");
-                    userData.userSettings.auto_load_page = defaultSettings["auto_load_page"];
-                }
-                if(userData.userSettings.auto_load_fresh === "saved")
-                {
-                    console.info("Resetting auto_load_fresh to default based on invalid view");
-                    userData.userSettings.auto_load_fresh = defaultSettings["auto_load_fresh"];
-                }
-            }
-
-            console.info('Verifying stored views.');
-            addGUIDsToViews();
-        }
-        //We know there was an upgrade and it should have been to the next version whatever that was.
-        saveNeeded.storageVersion = true;
-        userData.storageVersion = versionTree[versionTree.indexOf(fromVersionNumber) + 1];
-        /* TODO: Right now if we are coming from an unknown version... or rather one not in the tree... it returns -1
-         /        looking for it which we then add one to making it 0... which means we get null as the next version...
-         /        basically this puts us on the whole upgrade process. This works, but maybe we should try and find the closest version match. */
-        console.log("Upgrade from " + fromVersionNumber + " to " + userData.storageVersion + " complete.");
     }
 
     function addGUIDsToViews(callback)
@@ -333,7 +322,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 
     function resetVersion()
     {
-        userData.storageVersion = versionTree[0];
+        userData.storageVersion = versionTree[0].version;
         saveNeeded.storageVersion = true;
 
         //SPECIFICALLY USE savedViews
@@ -375,10 +364,60 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 		if(saveNeeded.userSettings)
 		{
             console.info("User Settings have been changed, a save will be required.");
-			setUserSettings(userData.userSettings);
+			//setUserSettings(userData.userSettings);
 		}
         console.groupEnd();
 	}
+	
+	/**
+	 * Adds a setting. if no value provided, it will ook into the default value array.
+	 *
+	 */
+    function addSetting(settingName, settingValue)
+    {
+        console.group("Adding Setting: " + settingName);
+        
+        console.info("Current userSettings: " + JSON.stringify(userData.userSettings));
+                
+        if(typeof userData.userSettings !== "undefined")
+        {
+            if(typeof userData.userSettings[settingName] === "undefined")
+            {
+                console.info("Detected missing setting, loading default for: " + defSetting);
+                
+                if(typeof settingValue === "undefined")
+                {
+                    console.info("Missing setting detected, and no value provided. Loading Default");
+                    if(typeof defaultSettings[settingName] !== "undefined")
+                    {
+                        userData.userSettings[settingName] = defaultSettings[settingName];
+                        saveNeeded.userSettings = true;
+                    }
+                }
+                else
+                {
+                    console.info("Missing setting detected, loading passed in value.");
+                    userData.userSettings[settingName] = settingValue;
+                    saveNeeded.userSettings = true;
+                }
+            }
+            else
+            {
+                console.info("setting was already present");
+            }
+        }
+        else
+        {
+            //Check all the settings we have defaults for, and load them in if needed
+            console.error('User Settings not present yet.');
+        }
+        if(saveNeeded.userSettings)
+        {
+            console.info("User Settings have been changed, a save will be required.");
+            //setUserSettings(userData.userSettings);
+        }
+        console.groupEnd();
+    }
 	
 	//Returns an Array of userSettings. Not JSON.
 	getUserSettings = function()
@@ -394,6 +433,15 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 
         saveUserData(callback);
 	}
+	
+	/*Takes as input a settings object... overwrites the user settings with it. May want to do error checking on what we get.*/
+    setUserViews = function(viewsObject, callback)
+    {
+        userData.userViews = viewsObject;
+        saveNeeded.userViews = true;
+
+        saveUserData(callback);
+    }
 	
 	//Returns an Array of userViews. not JSON
 	getUserViews = function()
@@ -424,7 +472,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
             userData.storageVersion = newData.storageVersion;
             userData.userSettings = newData.userSettings
             userData.userViews = newData.userViews; //Wow... i really gotta fix this naming...
-
         }
         saveUserData(callback);
     }
@@ -433,6 +480,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 	ns.init = init;
 	ns.getUserSettings = getUserSettings;
 	ns.getUserViews = getUserViews;
+	ns.setUserViews = setUserViews;
 	ns.setUserSettings = setUserSettings;
     ns.getAllData = getAllData;
     ns.setAllData = setAllData;
