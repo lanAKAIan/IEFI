@@ -134,7 +134,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(Md(name)) };
+        hooks.valueFromCookie   = function(name){ return(Ld(name)) };
         hooks.dashboardConstructor = kg;
     }
 
