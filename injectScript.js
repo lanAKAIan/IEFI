@@ -212,7 +212,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
                 var newLine = ';' + commVar[1] + '.' + ChatModeVar + '="' + userData.userSettings.comm_default_chat_tab + '";'; //do the override
                 //visually fix
-                    newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
+                    newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_fac'), document.getElementById('pl_tab_all'))";
 
                 replaceInFunction("Gf",commVar[0],commVar[0]+newLine); /*DASHBOARD_UPDATE_LINE*/
             }
