@@ -129,13 +129,13 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
     function setUpKnownHooks()
     {
-        hooks.getMap            = function(){return (V.e().q); }
+        hooks.getMap            = function(){return (Fd.g().p); } /*DASHBOARD_UPDATE_LINE in doGeocode, then in input91*/
         hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(Ld(name)) };
-        hooks.dashboardConstructor = kg;
+        hooks.valueFromCookie   = function(name){ return(vd(name)) }; /*DASHBOARD_UPDATE_LINE*/
+        hooks.dashboardConstructor = Gf; /*DASHBOARD_UPDATE_LINE*/
     }
 
     function identifyHooks()
@@ -212,9 +212,9 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
                 var newLine = ';' + commVar[1] + '.' + ChatModeVar + '="' + userData.userSettings.comm_default_chat_tab + '";'; //do the override
                 //visually fix
-                    newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_all'), document.getElementById('pl_tab_fac'))";
+                    newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_fac'), document.getElementById('pl_tab_all'))";
 
-                replaceInFunction("kg",commVar[0],commVar[0]+newLine);
+                replaceInFunction("Gf",commVar[0],commVar[0]+newLine); /*DASHBOARD_UPDATE_LINE*/
             }
 
 
@@ -238,7 +238,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
                 //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
-                var matches = signatures.dashboardConst.exec(kg.toString());
+                var matches = signatures.dashboardConst.exec(Gf.toString()); /*DASHBOARD_UPDATE_LINE*/
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
                 //  matches[2] - zoomLevel variable
