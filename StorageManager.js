@@ -64,7 +64,10 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 							, "nonselectable_spinner":          "on"
 							, "extension_updated_notification": "on"
 							, "iitc_incompatibility_warn":      "on"
-							, "dashboard_incompatibility_warn": "on" };
+							, "dashboard_incompatibility_warn": "on"
+							, "comm_show_portal_addresses":     "show"
+							, "comm_agentur_readability_css":   "off"
+							, "dev_map_filter_mode":            "off" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
@@ -212,6 +215,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     addMissingSettings();
                     break;
                 case "1.4.0.30":
+                    addMissingSettings();
+                    break;
+                case "1.4.4.0":
                     addMissingSettings();
                     break;
                 default:

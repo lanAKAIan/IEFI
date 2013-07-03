@@ -200,6 +200,8 @@ chrome.extension.onMessage.addListener(
                 document.dispatchEvent(event);
                 
                 fixSelectables();
+                adjustCommStyle();
+                adjustDeveloperFilterStyle();
             }
             requestUserLocation(initInjected);
 
@@ -387,6 +389,82 @@ function fixSelectables() {
 
     } catch (e) {
         console.error('There was a problem making loading... unselectable: \n' + locus + '\n' + e.message);
+    }
+}
+
+var commStyle;
+function adjustCommStyle() {
+    var locus = "";
+
+    var commCSS = ""; //fill it out then append
+    try {
+            if (userData.userSettings.comm_show_portal_addresses === "hide") {
+                locus = "Creating portal address hide CSS.";
+                commCSS += "span.pl_portal_address {display: none;}\n";
+            }
+            
+            if (userData.userSettings.comm_agentur_readability_css === "on") {
+                locus = "Adding root's Tweaks.";
+                commCSS += "#comm, .pl_timestamp {font-size: 11px;}\n"
+                commCSS += "#comm .comm_expanded {position: absolute; top: 0; bottom: 0;}\n";
+                commCSS += "#plexts {background: #1D2525; font-family: Tahoma, Arial, Helvetica, sans-serif; font-size: 11px;}\n";
+                commCSS += ".pl_content {line-height: 11px; padding: 0;}\n";
+                commCSS += ".pl_portal_name {color: #ecc979; text-decoration: none;}\n";
+                commCSS += ".pl_timestamp {color: #eee;}\n";
+                commCSS += ".pl_timestamp_spacer {height: 15px;}\n";
+                commCSS += "@media (min-height: 800px) {.comm_expanded #plext_container {height: 46rem;}}\n";
+            }
+            
+            if(commCSS.length>0)
+            {
+                console.log('commCSS: ' + commCSS);
+                commStyle = document.createElement('style');
+                commStyle.setAttribute("type", "text/css");
+                commStyle.appendChild(document.createTextNode(commCSS));
+                locus = "Appending Comm Style.";
+                head.appendChild(commStyle);
+                console.log('sent append style');
+            }
+            else if(typeof commStyle !== "undefined")
+            {
+                document.removeChild(commStyle);
+            }
+    } catch (e) {
+        console.error('There was a problem adjusting the comm style: \n' + locus + '\n' + e.message);
+    }
+}
+
+var developerFilterStyle;
+function adjustDeveloperFilterStyle() {
+    var locus = "";
+
+    var developerFilterCSS = ""; //fill it out then append
+    try {
+            if (userData.userSettings.dev_map_filter_mode === "wwii") {
+                locus = "adding wwii mode to css";
+                developerFilterCSS += "body {-webkit-filter: grayscale(100%) invert(100%);}";
+            }
+            else if(userData.userSettings.dev_map_filter_mode === "sepia") {
+                locus = "adding sepia mode to css";
+                developerFilterCSS += "body {-webkit-filter: sepia(100%) invert(100%);}";
+            }
+            
+            if(developerFilterCSS.length>0)
+            {
+                console.log('developerFilterStyle: ' + developerFilterCSS);
+                developerFilterStyle = document.createElement('style');
+                developerFilterStyle.setAttribute("type", "text/css");
+                developerFilterStyle.appendChild(document.createTextNode(developerFilterCSS));
+                locus = "Appending developerFilterStyle.";
+                head.appendChild(developerFilterStyle);
+                console.log('sent append style');
+            }
+            else if(typeof developerFilterStyle !== "undefined")
+            {
+                document.removeChild(developerFilterStyle);
+            }
+    } catch (e) {
+        console.error('There was a problem adjusting the developerFilterStyle style: \n' + locus + '\n' + e.message);
     }
 }
 

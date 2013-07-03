@@ -32,6 +32,18 @@
 				<label class="c"><input type="radio" name="comm_time_format" value="twentyfour" id="time_format_twentyfour"><span>Twenty-Four</span></label>
 				<h4 class="description">Changes the time format for present day and past dates.</h4>
 			</div>-->
+			<div class="horizontalFlex">
+				<h3>Show Addresses</h3>
+				<label class="c"><input type="radio" name="comm_show_portal_addresses" value="show" id="comm_show_portal_addresses_show"><span>Show</span></label>
+				<label class="c"><input type="radio" name="comm_show_portal_addresses" value="hide" id="comm_show_portal_addresses_hide"><span>Hide</span></label>
+				<h4 class="description">Determines visibibility of the portal addresses in the chat log. NOTE: Requires page reload to apply.</h4>
+			</div>
+			<div class="horizontalFlex">
+				<h3>Agentur's Readability Tweaks</h3>
+				<label class="c"><input type="radio" name="comm_agentur_readability_css" value="on" id="comm_agentur_readability_css_on"><span>On</span></label>
+				<label class="c"><input type="radio" name="comm_agentur_readability_css" value="off" id="comm_agentur_readability_css_off"><span>Off</span></label>
+				<h4 class="description">Various display tweaks provided by root@agentursimon.de. NOTE: Requires page reload to apply.</h4>
+			</div>
 		</section>
 		<header class="cathead">
 			<h2>Screenshots</h2>
@@ -233,6 +245,19 @@
 				<label class="c"><input type="radio" name="dashboard_incompatibility_warn" value="on" id="dashboard_incompatibility_warn_on"><span>On</span></label>
 				<label class="c"><input type="radio" name="dashboard_incompatibility_warn" value="off" id="dashboard_incompatibility_warn_off"><span>Off</span></label>
 				<h4 class="description">Turning this setting off will keep the extension from harassing you that it doesn't recognize the dashboard until the next release.</h4>
+			</div>
+		</section>
+		<header class="cathead">
+			<h2>Random Developer Options and Tests</h2>
+			<p>Play with them if you wish, but dont expect them to carry over between upgrades... or work for that matter.</p>
+		</header>
+		<section class="catlinks">
+			<div class="horizontalFlex">
+				<h3>Adjusted Map Theme</h3>
+				<label class="c"><input type="radio" name="dev_map_filter_mode" value="off" id="dev_map_filter_mode_off"><span>Off</span></label>
+				<label class="c"><input type="radio" name="dev_map_filter_mode" value="wwii" id="dev_map_filter_mode_wwii"><span>WWII</span></label>
+				<label class="c"><input type="radio" name="dev_map_filter_mode" value="sepia" id="dev_map_filter_mode_sepia"><span>SEP</span></label>
+				<h4 class="description">Theming the map in the most global and least targeted way... NOTE: Requires page reload to apply.</h4>
 			</div>
 		</section>
 		<!--<button id="getJSON" type="button">getJSON</button>-->
