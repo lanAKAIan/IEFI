@@ -84,6 +84,8 @@ function getVisibleTab(callback)
             else
             {
                 console.info('No visible ingress tab detected.');
+                callback(null); //Need to verify if this si the right way to handle. We dont want to not do the callback though necessarily
+                                //since that stalls some processes...
             }
         });
     }
@@ -186,6 +188,37 @@ function getCurrentView( callback )
         });
     }
     getVisibleTab(getCurView);
+}
+
+var cachedTeam = null;
+function getPlayerTeam( callback )
+{
+    var getTeam = function(tab)
+    {
+        if(tab !== null)
+        {
+            chrome.tabs.sendMessage(tab.id, {request: "GET_PLAYER_TEAM" }, function(response)
+            {
+                if(callback != undefined)
+                {
+                    cachedTeam = response.teamName;
+                    callback(cachedTeam);
+                }
+            });
+        }
+        else if(cachedTeam)
+        {
+            console.log("We were unable to get a tab to get the team from, but we had a cached value of: " + cachedTeam);
+            callback(cachedTeam); //Maybe we will get lucky and it had something...
+        }
+        else
+        {
+            console.warn("We did not have a cached value, and we cant figure out the tab so, using unknown.");
+            callback("unknown");
+        }
+        
+    }
+    getVisibleTab(getTeam);
 }
 
 //add autoclose? take an object maybe instead?
@@ -409,6 +442,33 @@ function saveScreenshot(windowId) {
     });
 }
 
+function getTheme(callback)
+{
+    console.debug("in getTheme");
+    var choice = IPP.StorageManager.getUserSettings().iefi_theme;
+    console.debug("choice was: " + choice);
+    
+    var onceHad = function(theme)
+    {
+        if(!(theme === "enlightened" || theme=== "resistance"))
+        {
+            theme = "classic";
+        }
+        console.debug("choice is now: " + theme);
+        callback(theme);
+    }
+    
+    if(choice==="faction")
+    {
+        getPlayerTeam( onceHad );
+        //TODO: make this actually find out rather than forcing the enlightnment upon to resitat.
+        //choice = "enlightened"
+    }
+    else
+    {
+        onceHad(choice);
+    }
+}
 
 /*
  * Requests from the content page if the user is logged In
