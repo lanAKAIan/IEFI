@@ -63,17 +63,5 @@ function initPopup()
     document.getElementById("SaveToDisk").addEventListener(  'click', function(){saveShot(dataUrl);});
     document.getElementById('saveFileName').placeholder = generateFilename() + '.' + fileExtension;
     
-    setTheme();
-}
-
-
-function setTheme()
-{
-    document.body.classList.remove("enlightened");
-    document.body.classList.remove("resistance");
-    document.body.classList.remove("classic");
-    
-    console.log("about to request theme.");
-    backgroundPage.getTheme(function(themeChoice){console.log("got themeChoice " + themeChoice); document.body.classList.add(themeChoice);});
-    
+    setTheme(backgroundPage);
 }

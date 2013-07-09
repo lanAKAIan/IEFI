@@ -28,21 +28,11 @@ function initPopup()
 	document.getElementById("menu_about").addEventListener('click', loadAboutPage);
 	document.getElementById("menu_options").addEventListener('click', displayOptions);
 	
-	setTheme();
+	setTheme(backgroundPage);
 
 	//document.getElementById("DEBUG_MENU_ITEM").addEventListener('click', function(){});
 	//Populate the user's list of views
 	POPUP.loadSavedViews();
-}
-
-function setTheme()
-{
-    document.body.classList.remove("enlightened");
-    document.body.classList.remove("resistance");
-    document.body.classList.remove("classic");
-    
-    backgroundPage.getTheme(function(themeChoice){document.body.classList.add(themeChoice);});
-    
 }
 
 function redirectPopupTo(url)

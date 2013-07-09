@@ -30,19 +30,7 @@ function initPopup()
     generateGMapsURL();
     generateIntelURL();
     
-    setTheme();
-}
-
-
-function setTheme()
-{
-    document.body.classList.remove("enlightened");
-    document.body.classList.remove("resistance");
-    document.body.classList.remove("classic");
-    
-    console.log("about to request theme.");
-    backgroundPage.getTheme(function(themeChoice){console.log("got themeChoice " + themeChoice); document.body.classList.add(themeChoice);});
-    
+    setTheme(backgroundPage);
 }
 
 function loadMainMenu()

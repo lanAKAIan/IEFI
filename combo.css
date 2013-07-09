@@ -131,6 +131,33 @@ img.closeButton
 	background-color: #ebbc4a;
 }
 
+img.saveButton
+{
+	height: 36px;
+    width: 36px;
+    margin-left: -3px;
+    margin-top: -2px;
+	content:url("res/ic_menu_save.png");
+	-webkit-mask-box-image: url("res/ic_menu_save.png");
+	-webkit-mask-size: 100%;
+	-webkit-filter: contrast(250%);
+}
+
+.resistance img.saveButton
+{
+	background-color: #00c2ff;
+}
+
+.enlightened img.saveButton
+{
+	background-color: #28f428;
+}
+
+.classic img.saveButton
+{
+	background-color: #ebbc4a;
+}
+
 #notifyStatus
 {
     width: 100%;
