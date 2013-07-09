@@ -67,7 +67,8 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 							, "dashboard_incompatibility_warn": "on"
 							, "comm_show_portal_addresses":     "show"
 							, "comm_agentur_readability_css":   "off"
-							, "dev_map_filter_mode":            "off" };
+							, "dev_map_filter_mode":            "off"
+							, "dev_force_incompatible_version": "off" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}

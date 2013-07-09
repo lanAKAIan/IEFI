@@ -18,11 +18,11 @@
  */
 
 //TODO: Find a way to incorporate upgrade process into this... or at least the checks and know which version to go to.
-/**
- * Flag for testing. When true, we will always use the alternate method of hooking in functionality.
- * @type {Boolean}
- */
-var forceIncompatible = false;
+
+//NOTE: Requires the storageManager page to be loaded...
+
+var backgroundPage = backgroundPage || chrome.extension.getBackgroundPage();
+var SM = SM || backgroundPage.IPP.StorageManager;
 
 //Use runtime over extension... for event pages...
 var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
@@ -70,7 +70,8 @@ var versionTree = [ { "version": "1.0.0.0",  "compatible": dashboardHashes[0], u
 				   ,{ "version": "1.4.2.0",  "compatible": dashboardHashes[10], upgradeProcess: false }
 				   ,{ "version": "1.4.3.0",  "compatible": dashboardHashes[11], upgradeProcess: false }
 				   ,{ "version": "1.4.4.0",  "compatible": dashboardHashes[11], upgradeProcess: false }
-				   ,{ "version": "1.5.0.5",  "compatible": dashboardHashes[11], upgradeProcess: false }  ];
+				   ,{ "version": "1.5.0.5",  "compatible": dashboardHashes[11], upgradeProcess: false }
+				   ,{ "version": "1.5.0.6",  "compatible": dashboardHashes[11], upgradeProcess: true  } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {
@@ -96,7 +97,7 @@ function isDashboardCompatible(sha1, callback)
     {
         callback(retVal);
     }
-    return(retVal && !forceIncompatible);
+    return(retVal && !(SM.getUserSettings().dev_force_incompatible_version === "on"));
 }
 
 /**
@@ -259,9 +260,9 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
 {
     //console.groupCollapsed("Dashboard Compatibility Check").
         console.info('Checking compatibility of dashboard with extension version ' + currentVersion);
-    if(forceIncompatible)
+    if(SM.getUserSettings().dev_force_incompatible_version === "on")
     {
-        console.warn('forceIncompatible setting is turned on, function will all ways return "unknown" compatibility.');
+        console.warn('dev_force_Incompatible_version setting is turned on, function will all ways return "unknown" compatibility.');
     }
     var haveDB = function(dbInfo)
     {
