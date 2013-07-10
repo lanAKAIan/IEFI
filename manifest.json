@@ -22,12 +22,13 @@
 					"clipboardWrite",
 					"*://www.ingress.com/intel*" ],
   "optional_permissions": [ "geolocation" ],
-  "background": { "scripts": [ "background.js"
+  "background": { "scripts": [ "lib/CryptoJS/sha1.js"
+                             , "lib/CryptoJS/enc-base64-min.js" 
+                             , "Utilities.js"
                              , "StorageManager.js"
                              , "versioning.js"
-                             , "Utilities.js"
-                             , "lib/CryptoJS/sha1.js"
-                             , "lib/CryptoJS/enc-base64-min.js" ] },
+                             , "background.js"
+                             ] },
   "web_accessible_resources": [ "injectScript.js"
                               , "iitc-connection.js"
                               , "res/icon-128-menu.png"

@@ -17,6 +17,9 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 ////chrome.storage.sync.get(function(r){console.log(JSON.stringify(r, null, "  "))})
+
+var currentVersion = getExtensionVersion();
+
 var IPP;
 if(!IPP){ IPP = {} };
 if(!IPP.StorageManager){ IPP.StorageManager = {} };
@@ -495,8 +498,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     ns.resetVersion = resetVersion;
 	//Object.defineProperty(ns, "userSettings", { get : function(){return userSettings;}, configurable : false, enumerable : false } );
 })();
-IPP.StorageManager.init();
-
 console.log('StorageManager loaded');
 
 //View all in storage
