@@ -29,6 +29,8 @@ var transientData = { "userLocation": { "status": "pending",
                       "compatibility": "incompatible",
                       "IITCDetected": false };
 
+var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
+
 //TODO: While this fixes the immediate issue, determine if chrome prerendered the page and never actually displays it, are we leaking memory?
 var initSent = false; //This is a flag that is used to work around page being prerendered and background page not being able to talk to it.
 
@@ -42,19 +44,20 @@ function loggedIn() {
     if (document.getElementById("header_login_info") != null) {
         retVal = true;
     }
-
-    var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
-    var title = head.getElementsByTagName("title")[0].textContent;
-    if (title == "Ingress Intel Map") {
-        return true;
+    else{
+        var title = head.getElementsByTagName("title")[0].textContent;
+        if (title == "Ingress Intel Map") {
+            retVal = true;
+        }
+        else if (title == "Ingress") {
+            retVal = false;
+        }
+        else {
+            console.error('It seems that the title of the page is not the login or the map as expected... this is what it is: ' + title);
+            retVal = false;
+        }
     }
-    else if (title == "Ingress") {
-        return false;
-    }
-    else {
-        console.error('It seems that the title of the page is not the login or the map as expected... this is what it is: ' + title);
-        return false;
-    }
+    return retVal;    
 }
 
 function getDashboardURI()
@@ -90,7 +93,6 @@ function getDashboardURI()
  * at release only fire for ingress pages. Anyway the reason we have an injectScript.js file at all is because contentScript can not access the pages window variables
  * just dom.
  */
-var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
 var script = document.createElement('script');
     script.setAttribute("type", "text/javascript");
     script.setAttribute("async", true);
