@@ -356,10 +356,13 @@ function hidePII(hide, callback) {
             screenshotStyle = document.createElement('style');
             screenshotStyle.setAttribute("type", "text/css");
             screenshotStyle.appendChild(document.createTextNode(screenshotCSS));
-            screenshotStyle.addEventListener('load', function () {
+            var screenshotStyleWatch = function () {
+                screenshotStyle.removeEventListener('load', screenshotStyleWatch, false);
                 callback();
-            }, false);
+            }
+            screenshotStyle.addEventListener('load', screenshotStyleWatch, false);
             /*test success*/
+           //NOTE: aslong as we add the listenerbefore code is actually added to the page below, we are fine.
             head.appendChild(screenshotStyle);
             console.log('sent append style');
 
