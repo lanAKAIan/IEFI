@@ -24,8 +24,7 @@
 var backgroundPage = backgroundPage || chrome.extension.getBackgroundPage();
 var SM = SM || backgroundPage.IPP.StorageManager;
 
-//Use runtime over extension... for event pages...
-var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
+var currentVersion = getExtensionVersion();
 
 //So, interesting thought is this is the gzip compressed size/length of the file.
 var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "length": null  }
@@ -128,24 +127,7 @@ function getNextVersion(fromVersion)
 	return retVal;
 }
 
-/**
- * Takes as input a versionString in "major.minor.patch.build" format, and returns a version object.
- * This version object could help with sorting.
- * @param {string} versionString a version string consisting of up to four sections separated by periods
- * @return {Object} a version object with major, minor, patch and build members. Empty members will default to 0
- */
-function parseVersion(versionString)
-{
-    var v = versionString.split('.');
-    var out = { "major": v[0] ? parseInt(v[0], 10) : 0,
-        "minor": v[1] ? parseInt(v[1], 10) : 0,
-        "patch": v[2] ? parseInt(v[2], 10) : 0,
-        "build": v[3] ? parseInt(v[3], 10) : 0 };
-    out.versionString =( "" + out.major + "." + out.minor + "." + out.patch + "." + out.build);
 
-    //console.log(out.versionString);
-    return(out);
-}
 
 /**
  *The idea is that this variable would hold the dashboard incase we didnt identify it and wanted to look at it. 
@@ -320,15 +302,4 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
         //console.groupEnd("Dashboard Compatibility Check")
     }
     retrieveDashboard(haveDB, dashboardURI);
-}
-
-/**
- * Takes as input a file and returns the computed SHA1 hash for it. Makes use of open source CryptoJS
- * @param file a file to generate the SHA1 hash of
- * @return {String} the SHA1 hash generated for the file
- */
-function generateSHA1(file) {
-    var sha1 = CryptoJS.algo.SHA1.create();
-    sha1.update(CryptoJS.enc.Latin1.parse(file)); //ensure binary
-    return sha1.finalize().toString();
 }

@@ -84,3 +84,42 @@ function setTheme(backgroundPage)
     backgroundPage.getTheme(function(themeChoice){console.log("got themeChoice " + themeChoice); document.body.classList.add(themeChoice);});
     
 }
+
+/**
+ * Takes as input a file and returns the computed SHA1 hash for it. Makes use of open source CryptoJS
+ * @param file a file to generate the SHA1 hash of
+ * @return {String} the SHA1 hash generated for the file
+ */
+function generateSHA1(file) {
+    var sha1 = CryptoJS.algo.SHA1.create();
+    sha1.update(CryptoJS.enc.Latin1.parse(file)); //ensure binary
+    return sha1.finalize().toString();
+}
+
+
+/**
+ * Takes as input a versionString in "major.minor.patch.build" format, and returns a version object.
+ * This version object could help with sorting.
+ * @param {string} versionString a version string consisting of up to four sections separated by periods
+ * @return {Object} a version object with major, minor, patch and build members. Empty members will default to 0
+ */
+function parseVersion(versionString)
+{
+    var v = versionString.split('.');
+    var out = { "major": v[0] ? parseInt(v[0], 10) : 0,
+        "minor": v[1] ? parseInt(v[1], 10) : 0,
+        "patch": v[2] ? parseInt(v[2], 10) : 0,
+        "build": v[3] ? parseInt(v[3], 10) : 0 };
+    out.versionString =( "" + out.major + "." + out.minor + "." + out.patch + "." + out.build);
+
+    //console.log(out.versionString);
+    return(out);
+}
+
+function getExtensionVersion()
+{
+    //Use runtime over extension... for event pages...
+    return parseVersion(chrome.runtime.getManifest().version).versionString;
+}
+
+

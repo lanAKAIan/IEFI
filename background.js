@@ -23,6 +23,9 @@
   * additionally this ensures we can add our icon into the intel page if it is already displayed when they install.
   * NOTE: should test that the injected stuff is there though...
   */
+ 
+IPP.StorageManager.init(); //Needed to have versioning.js done.
+ 
 function installOrUpdate(install_details){
 	switch (install_details.reason){
 		case "install": 
