@@ -62,5 +62,6 @@ function initPopup()
 {
     document.getElementById("SaveToDisk").addEventListener(  'click', function(){saveShot(dataUrl);});
     document.getElementById('saveFileName').placeholder = generateFilename() + '.' + fileExtension;
+    
+    setTheme(backgroundPage);
 }
-

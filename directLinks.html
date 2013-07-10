@@ -3,6 +3,7 @@
 <head>
     <title>Intelligence Enhancer for Ingress - Direct Links</title>
     <LINK href="combo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="Utilities.js"></script>
     <script type="text/javascript" src="directLinks.js"></script>
 </head>
 <body>
@@ -12,17 +13,17 @@
                 <img src="res/Ingress_logo_512px con link.png">
                 <div class="box0 link_label"> ingress.com/intel: </div>
                 <div class="box1"><input id="input_intelDirectLink" class="directLink" readonly="readonly" placeholder="calculating..."/></div>
-                <div class="box0"><button id="copy_intelDirectLink" />Copy</button></div>
+                <div class="box0"><button id="copy_intelDirectLink">Copy</button></div>
             </div>
             <div id="directLinkGMaps" class="horizontalFlex">
                 <img src="res/gmaps.png">
                 <div class="box0 link_label"> google maps: </div>
                 <div class="box1"><input id="input_gmapsDirectLink" class="directLink" readonly="readonly" placeholder="calculating..."/></div>
-                <div class="box0"><button id="copy_gmapsDirectLink" />Copy</button></div>
+                <div class="box0"><button id="copy_gmapsDirectLink">Copy</button></div>
             </div>
-            <div id="notifyStatus"></div>
+            <div id="notifyStatus"> </div>
         </fieldset>
-        <div id="closeDiv"><img id="closeButton" src="res/ic_menu_close_clear_cancel.png" title="Close"></div>
+        <div id="closeDiv"><img id="closeButton" title="Close" class="closeButton"></div>
 </body>
 </html>
 

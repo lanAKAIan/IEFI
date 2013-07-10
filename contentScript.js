@@ -140,6 +140,13 @@ chrome.extension.onMessage.addListener(
             document.dispatchEvent(event);
             //console.log('conentScript sent request to the injectedpage for the view info.');
         }
+        else if (request.request == "GET_PLAYER_TEAM") {
+            //console.log('ContentScript requested to load a view.');
+            //set up how to handle the response
+            
+            sendResponse({ teamName: getPlayerTeam() }, function () {/*this is so we dont get error because background sent back a thanks*/
+                });
+        }
         else if (request.request == "HIDE_PII") {
             //console.log('ContentScript requested to hide pii');
             //hidePII(true, function(){alert('god damn you');});
@@ -551,6 +558,26 @@ function handleVisibilityChange() {
             sendInitEvent();
         }
     }
+}
+
+//"GET_PLAYER_TEAM"
+function getPlayerTeam()
+{
+    var team = document.querySelector(".player_nickname").parentElement.className;
+    if(team === "ALIENS")
+    {
+        team = "enlightened";
+    }
+    else if(team === "RESISTANCE")
+    {
+        team = "resistance";
+    }
+    else
+    {
+        team = "unknown";
+    }
+    console.log("Determined player to be a %s agent.", team);
+    return(team);
 }
 
 //We should probably make sure this is only added once, but since this is a content script it should be true.

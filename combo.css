@@ -1,10 +1,30 @@
-*
-{
+body {
     color:#EBBC4A;
-    background-color:#262626;
+    background-color:#0b0c0d;
+    min-width: 500px;
     white-space: nowrap;
     font-family: coda_regular, arial, helvetica, sans-serif;
 }
+
+
+.resistance
+{
+	color: #00c2ff;
+	border-color: #00c2ff;
+}
+
+.enlightened
+{
+	color: #28f428;
+	border-color: #28f428;
+}
+
+.classic
+{
+	color: #ebbc4a;
+	border-color: #ebbc4a;
+}
+
 
 @font-face {
     font-family: coda_regular;
@@ -33,7 +53,9 @@ img
 #windowFieldSet
 {
     display: inline-block;
-    border: 1px solid #EBBC4A;
+    border-width: 1px;
+	border-style: solid;
+	border-color: inherit;
     min-width: 500px;
     margin-right: 10px;
     margin-left: 10px;
@@ -44,7 +66,9 @@ img
 #windowName
 {
     display: inline-block;
-    border: 1px solid #EBBC4A;
+    border-width: 1px;
+	border-style: solid;
+	border-color: inherit;
     padding-left: 3px;
     padding-right: 3px;
     background-color: transparent;
@@ -54,7 +78,7 @@ input {
     width:100%;
     background-color:#3A3F44;
     color:#EBBC4A;
-    border-color:#EBBC4A;
+    border-color:inherit;
 }
 
 #performSaveButton
@@ -79,12 +103,59 @@ input {
     height: 30px;
     overflow: hidden;
 }
-#closeButton
+
+img.closeButton
 {
-    height: 36px;
+	height: 36px;
     width: 36px;
-    margin-left: -4px;
-    margin-top: -2px
+    margin-left: -3px;
+    margin-top: -2px;
+	content:url("res/ic_menu_close_clear_cancel.png");
+	-webkit-mask-box-image: url("res/ic_menu_close_clear_cancel.png");
+	-webkit-mask-size: 100%;
+	-webkit-filter: contrast(250%);
+}
+
+.resistance img.closeButton
+{
+	background-color: #00c2ff;
+}
+
+.enlightened img.closeButton
+{
+	background-color: #28f428;
+}
+
+.classic img.closeButton
+{
+	background-color: #ebbc4a;
+}
+
+img.saveButton
+{
+	height: 36px;
+    width: 36px;
+    margin-left: -3px;
+    margin-top: -2px;
+	content:url("res/ic_menu_save.png");
+	-webkit-mask-box-image: url("res/ic_menu_save.png");
+	-webkit-mask-size: 100%;
+	-webkit-filter: contrast(250%);
+}
+
+.resistance img.saveButton
+{
+	background-color: #00c2ff;
+}
+
+.enlightened img.saveButton
+{
+	background-color: #28f428;
+}
+
+.classic img.saveButton
+{
+	background-color: #ebbc4a;
 }
 
 #notifyStatus
