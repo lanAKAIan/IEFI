@@ -225,6 +225,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                 case "1.4.4.0":
                     addMissingSettings();
                     break;
+                case "1.5.0.5":
+                    addMissingSettings();
+                    break;
                 default:
                     //So ideally when we go in later with a version that doesnt need an upgrade, it will fall through to this.
                     console.log('Upgrade from ' + fromVersionNumber + ' requires no storage changes.');
