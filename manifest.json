@@ -16,13 +16,20 @@
 	  "matches": [ "*://www.ingress.com/intel*" ],
 	  "run_at": "document_end" } ],
   "options_page": "options.html",
-  "permissions" : [
-    "tabs",
-	"storage",
-	"notifications",
-	"clipboardWrite",
-	"*://www.ingress.com/intel*" ],
-  "optional_permissions": ["geolocation"],
-  "background": { "scripts": [ "background.js", "StorageManager.js", "versioning.js", "Utilities.js", "lib/CryptoJS/sha1.js", "lib/CryptoJS/enc-base64-min.js" ] },
-  "web_accessible_resources": [ "injectScript.js", "iitc-connection.js","res/icon-128-menu.png", "res/icon-48.png" ]
+  "permissions" : [ "tabs",
+					"storage",
+					"notifications",
+					"clipboardWrite",
+					"*://www.ingress.com/intel*" ],
+  "optional_permissions": [ "geolocation" ],
+  "background": { "scripts": [ "background.js"
+                             , "StorageManager.js"
+                             , "versioning.js"
+                             , "Utilities.js"
+                             , "lib/CryptoJS/sha1.js"
+                             , "lib/CryptoJS/enc-base64-min.js" ] },
+  "web_accessible_resources": [ "injectScript.js"
+                              , "iitc-connection.js"
+                              , "res/icon-128-menu.png"
+                              , "res/icon-48.png" ]
 }
