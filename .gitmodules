@@ -1,0 +1,3 @@
+[submodule "external/FileSaver"]
+	path = external/FileSaver
+	url = https://github.com/eligrey/FileSaver.js.git
