@@ -1,0 +1,55 @@
+THERE IS CURRENTLY A KNOWN ISSUE
+in which the ingress page will get stuck at "Loading Data..." and will not paint any of the map or the chatlog. 
+This only appears to happen once per session.
+
+If this happens, just hit reload on the page and it will fix the issue. I am currently investigating the cause. My apologies.
+========================================================
+
+Provides additional functionality for Google's Ingress Intel Map, without adversely affecting Google's Servers.
+Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
+1.5.0.21
+New Features:
+* Added theme capability for the extension, based on the user's faction. Can be overridden in the options page.
+* Added some comm adjustment options(off by default) including:
+ . Ability to turn off portal addresses in the chatlog.
+ . Bertram Simon's comm readability CSS improvements.
+* Added a "Developer Options" section which will be a place to contain some settings that may or may not stay. The real reason was to make things easier on me.
+ . A theme option with Bertram Simon's WWII bombing map and a tweaked version of the bombing map using inverted sepia. These are just kinda fun, not necessarily useful.
+ . force incompatability option - truly a developer setting
+
+Bug Fixes:
+* cleaning up the code structure a bit for stability improvements including
+* added missing listener removal for screenshot CSS.
+* modified the load order of extension components and refactored to remove some dependencies.
+
+1.4.4.0
+* Compatibility update for dashboard update on 06/10/13 in order to remove the harassment... functionality did not break.
+* Fixed a bug in which when setting the default chat mode to "All" the tab would still visually appear to be "Faction". The mode on the actual chat content was correct however.
+
+Changelog for Prior Versions:
+http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog
+
+Features: 
+* Settings page allows for turning on and off customizations.
+* Uses a PageAction instead of Browser Action(icon is only visible while on ingress.com/intel site.) Located next to the favorites star.
+* Bookmarking Map Views without a complete page refresh.
+* Generating Google Maps and Ingress Intel Map direct links to views to share with others.
+* Taking screenshots of the intel map while hiding PII(email, level, ap, xm, chatlog, etc.) Customization available from the settings page.
+* Option to trim whitespace from passcode box on submit.
+* Default chat mode selection.
+* Loading the map to geolocation or a saved view automatically on pageload.
+* Adjust chatlog to remove portal addresses.
+* I dont bite, contact me if you want more.
+
+If you have problems or feature requests, please submit them to the google code page.
+
+Permission Justifications:
+* "tabs" - Allows capturing of screenshots
+* "storage" - Allows storage and syncing of your saved views
+* "notifications" - Allows notifying you of changes after an update
+* "clipboardWrite" - Allows the copy buttons for direct intel links
+* "http://www.ingress.com/intel*" - Allows extension to interact with javascript on the intel page needed to get view info, hide pii, detect version, etc.
+* "geolocation" - Optional permission used for automatically moving the map to your location if you turn it on.
+
+Change log:
+http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog
