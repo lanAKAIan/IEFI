@@ -33,6 +33,8 @@ function initPopup()
     document.getElementById("saveViewForm"      ).addEventListener('submit', function(e){e.preventDefault(); saveCurrentView(); });
     document.getElementById('input_saveViewName').focus();
     document.getElementById('input_saveViewName').addEventListener('click', clearStatus);
+    
+    setTheme(backgroundPage);
 }
 
 function loadMainMenu()

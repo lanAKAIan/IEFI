@@ -18,14 +18,13 @@
  */
 
 //TODO: Find a way to incorporate upgrade process into this... or at least the checks and know which version to go to.
-/**
- * Flag for testing. When true, we will always use the alternate method of hooking in functionality.
- * @type {Boolean}
- */
-var forceIncompatible = false;
 
-//Use runtime over extension... for event pages...
-var currentVersion = parseVersion(chrome.runtime.getManifest().version).versionString;
+//NOTE: Requires the storageManager page to be loaded...
+
+var backgroundPage = backgroundPage || chrome.extension.getBackgroundPage();
+var SM = SM || backgroundPage.IPP.StorageManager;
+
+var currentVersion = getExtensionVersion();
 
 //So, interesting thought is this is the gzip compressed size/length of the file.
 var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "length": null  }
@@ -43,33 +42,38 @@ var dashboardHashes = [ {"sha1": "759f4a6f0401791573bbe2720240b9cb31e7bf72", "le
 
 /*
  * upgrade process flag implies an upgrade process is needed to get to this version, not necessarily from it to the next.
+ * TODO: I dont think we are actually using "upgrade process" atm to determine if there is one.
  * */
-var versionTree = [ { "version": "1.0.0.0",  "compatible": dashboardHashes[0], upgradeProcess: false }
-				   ,{ "version": "1.0.1.0",  "compatible": dashboardHashes[0], upgradeProcess: false }
-				   ,{ "version": "1.0.2.0",  "compatible": dashboardHashes[1], upgradeProcess: false }
-				   ,{ "version": "1.1.0.30", "compatible": dashboardHashes[1], upgradeProcess: true  }
-				   ,{ "version": "1.2.0.6" , "compatible": dashboardHashes[1], upgradeProcess: true  }
-				   ,{ "version": "1.2.1.0" , "compatible": dashboardHashes[2], upgradeProcess: false }
-				   ,{ "version": "1.2.2.0" , "compatible": dashboardHashes[2], upgradeProcess: false }
-				   ,{ "version": "1.2.3.0" , "compatible": dashboardHashes[3], upgradeProcess: false }
-				   ,{ "version": "1.3.0.9" , "compatible": dashboardHashes[3], upgradeProcess: true  }
-				   ,{ "version": "1.3.1.0" , "compatible": dashboardHashes[3], upgradeProcess: false }
-				   ,{ "version": "1.3.2.0" , "compatible": dashboardHashes[4], upgradeProcess: false }
-				   ,{ "version": "1.3.2.1" , "compatible": dashboardHashes[4], upgradeProcess: false }
-				   ,{ "version": "1.3.2.2" , "compatible": dashboardHashes[4], upgradeProcess: false }
-				   ,{ "version": "1.3.3.0" , "compatible": dashboardHashes[4], upgradeProcess: false }
-				   ,{ "version": "1.3.3.8" , "compatible": dashboardHashes[5], upgradeProcess: false }
-				   ,{ "version": "1.3.4.0" , "compatible": dashboardHashes[6], upgradeProcess: false }
-				   ,{ "version": "1.3.5.0" , "compatible": dashboardHashes[7], upgradeProcess: false }
-				   ,{ "version": "1.3.6.0" , "compatible": dashboardHashes[8], upgradeProcess: false }
-				   ,{ "version": "1.3.7.0" , "compatible": dashboardHashes[8], upgradeProcess: false }
-				   ,{ "version": "1.4.0.1" , "compatible": dashboardHashes[8], upgradeProcess: true  }
-				   ,{ "version": "1.4.0.30", "compatible": dashboardHashes[8], upgradeProcess: true  }
-				   ,{ "version": "1.4.0.35", "compatible": dashboardHashes[8], upgradeProcess: false }
-				   ,{ "version": "1.4.1.1",  "compatible": dashboardHashes[9], upgradeProcess: false }
-				   ,{ "version": "1.4.2.0",  "compatible": dashboardHashes[10], upgradeProcess: false }
-				   ,{ "version": "1.4.3.0",  "compatible": dashboardHashes[11], upgradeProcess: false }
-				   ,{ "version": "1.4.4.0",  "compatible": dashboardHashes[11], upgradeProcess: false }  ];
+var versionTree = [ { "version": "1.0.0.0" , "compatible": dashboardHashes[ 0], upgradeProcess: false }
+				   ,{ "version": "1.0.1.0" , "compatible": dashboardHashes[ 0], upgradeProcess: false }
+				   ,{ "version": "1.0.2.0" , "compatible": dashboardHashes[ 1], upgradeProcess: false }
+				   ,{ "version": "1.1.0.30", "compatible": dashboardHashes[ 1], upgradeProcess: true  }
+				   ,{ "version": "1.2.0.6" , "compatible": dashboardHashes[ 1], upgradeProcess: true  }
+				   ,{ "version": "1.2.1.0" , "compatible": dashboardHashes[ 2], upgradeProcess: false }
+				   ,{ "version": "1.2.2.0" , "compatible": dashboardHashes[ 2], upgradeProcess: false }
+				   ,{ "version": "1.2.3.0" , "compatible": dashboardHashes[ 3], upgradeProcess: false }
+				   ,{ "version": "1.3.0.9" , "compatible": dashboardHashes[ 3], upgradeProcess: true  }
+				   ,{ "version": "1.3.1.0" , "compatible": dashboardHashes[ 3], upgradeProcess: false }
+				   ,{ "version": "1.3.2.0" , "compatible": dashboardHashes[ 4], upgradeProcess: false }
+				   ,{ "version": "1.3.2.1" , "compatible": dashboardHashes[ 4], upgradeProcess: false }
+				   ,{ "version": "1.3.2.2" , "compatible": dashboardHashes[ 4], upgradeProcess: false }
+				   ,{ "version": "1.3.3.0" , "compatible": dashboardHashes[ 4], upgradeProcess: false }
+				   ,{ "version": "1.3.3.8" , "compatible": dashboardHashes[ 5], upgradeProcess: false }
+				   ,{ "version": "1.3.4.0" , "compatible": dashboardHashes[ 6], upgradeProcess: false }
+				   ,{ "version": "1.3.5.0" , "compatible": dashboardHashes[ 7], upgradeProcess: false }
+				   ,{ "version": "1.3.6.0" , "compatible": dashboardHashes[ 8], upgradeProcess: false }
+				   ,{ "version": "1.3.7.0" , "compatible": dashboardHashes[ 8], upgradeProcess: false }
+				   ,{ "version": "1.4.0.1" , "compatible": dashboardHashes[ 8], upgradeProcess: true  }
+				   ,{ "version": "1.4.0.30", "compatible": dashboardHashes[ 8], upgradeProcess: true  }
+				   ,{ "version": "1.4.0.35", "compatible": dashboardHashes[ 8], upgradeProcess: false }
+				   ,{ "version": "1.4.1.1" , "compatible": dashboardHashes[ 9], upgradeProcess: false }
+				   ,{ "version": "1.4.2.0" , "compatible": dashboardHashes[10], upgradeProcess: false }
+				   ,{ "version": "1.4.3.0" , "compatible": dashboardHashes[11], upgradeProcess: false }
+				   ,{ "version": "1.4.4.0" , "compatible": dashboardHashes[11], upgradeProcess: false }
+				   ,{ "version": "1.5.0.5" , "compatible": dashboardHashes[11], upgradeProcess: true  }
+				   ,{ "version": "1.5.0.20", "compatible": dashboardHashes[11], upgradeProcess: true  }
+				   ,{ "version": "1.5.0.21", "compatible": dashboardHashes[11], upgradeProcess: false }
+				   ,{ "version": "1.5.0.22", "compatible": dashboardHashes[11], upgradeProcess: false }  ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {
@@ -95,7 +99,7 @@ function isDashboardCompatible(sha1, callback)
     {
         callback(retVal);
     }
-    return(retVal && !forceIncompatible);
+    return(retVal && !(SM.getUserSettings().dev_force_incompatible_version === "on"));
 }
 
 /**
@@ -126,24 +130,7 @@ function getNextVersion(fromVersion)
 	return retVal;
 }
 
-/**
- * Takes as input a versionString in "major.minor.patch.build" format, and returns a version object.
- * This version object could help with sorting.
- * @param {string} versionString a version string consisting of up to four sections separated by periods
- * @return {Object} a version object with major, minor, patch and build members. Empty members will default to 0
- */
-function parseVersion(versionString)
-{
-    var v = versionString.split('.');
-    var out = { "major": v[0] ? parseInt(v[0], 10) : 0,
-        "minor": v[1] ? parseInt(v[1], 10) : 0,
-        "patch": v[2] ? parseInt(v[2], 10) : 0,
-        "build": v[3] ? parseInt(v[3], 10) : 0 };
-    out.versionString =( "" + out.major + "." + out.minor + "." + out.patch + "." + out.build);
 
-    //console.log(out.versionString);
-    return(out);
-}
 
 /**
  *The idea is that this variable would hold the dashboard incase we didnt identify it and wanted to look at it. 
@@ -258,9 +245,9 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
 {
     //console.groupCollapsed("Dashboard Compatibility Check").
         console.info('Checking compatibility of dashboard with extension version ' + currentVersion);
-    if(forceIncompatible)
+    if(SM.getUserSettings().dev_force_incompatible_version === "on")
     {
-        console.warn('forceIncompatible setting is turned on, function will all ways return "unknown" compatibility.');
+        console.warn('dev_force_Incompatible_version setting is turned on, function will all ways return "unknown" compatibility.');
     }
     var haveDB = function(dbInfo)
     {
@@ -318,15 +305,4 @@ function checkDashboardCompatibility(callback, opt_CompatibilityReturn, dashboar
         //console.groupEnd("Dashboard Compatibility Check")
     }
     retrieveDashboard(haveDB, dashboardURI);
-}
-
-/**
- * Takes as input a file and returns the computed SHA1 hash for it. Makes use of open source CryptoJS
- * @param file a file to generate the SHA1 hash of
- * @return {String} the SHA1 hash generated for the file
- */
-function generateSHA1(file) {
-    var sha1 = CryptoJS.algo.SHA1.create();
-    sha1.update(CryptoJS.enc.Latin1.parse(file)); //ensure binary
-    return sha1.finalize().toString();
 }

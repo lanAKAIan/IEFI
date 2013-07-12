@@ -17,6 +17,9 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 ////chrome.storage.sync.get(function(r){console.log(JSON.stringify(r, null, "  "))})
+
+var currentVersion = getExtensionVersion();
+
 var IPP;
 if(!IPP){ IPP = {} };
 if(!IPP.StorageManager){ IPP.StorageManager = {} };
@@ -64,7 +67,12 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
 							, "nonselectable_spinner":          "on"
 							, "extension_updated_notification": "on"
 							, "iitc_incompatibility_warn":      "on"
-							, "dashboard_incompatibility_warn": "on" };
+							, "dashboard_incompatibility_warn": "on"
+							, "comm_show_portal_addresses":     "show"
+							, "comm_agentur_readability_css":   "off"
+							, "dev_map_filter_mode":            "off"
+							, "dev_force_incompatible_version": "off"
+							, "iefi_theme":                     "faction" };
 	var debugViews = [ {"latitude":34.21914466653219,"longitude":-118.86657265823362,"viewName":"CLU","zoomLevel":15}
 					  ,{"latitude":34.18707661724589,"longitude":-118.88047722976683,"viewName":"The TO Mall","zoomLevel":16}
 					  ,{"latitude":34.198648786607514,"longitude":-118.8714864651489,"viewName":"Thousand Oaks","zoomLevel":13}
@@ -212,6 +220,12 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     addMissingSettings();
                     break;
                 case "1.4.0.30":
+                    addMissingSettings();
+                    break;
+                case "1.4.4.0":
+                    addMissingSettings();
+                    break;
+                case "1.5.0.5":
                     addMissingSettings();
                     break;
                 default:
@@ -487,8 +501,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
     ns.resetVersion = resetVersion;
 	//Object.defineProperty(ns, "userSettings", { get : function(){return userSettings;}, configurable : false, enumerable : false } );
 })();
-IPP.StorageManager.init();
-
 console.log('StorageManager loaded');
 
 //View all in storage

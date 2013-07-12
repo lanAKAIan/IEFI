@@ -29,6 +29,8 @@ function initPopup()
     document.getElementById("copy_gmapsDirectLink").addEventListener('click', copyMapsToClipboard);
     generateGMapsURL();
     generateIntelURL();
+    
+    setTheme(backgroundPage);
 }
 
 function loadMainMenu()

@@ -29,6 +29,8 @@ var transientData = { "userLocation": { "status": "pending",
                       "compatibility": "incompatible",
                       "IITCDetected": false };
 
+var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
+
 //TODO: While this fixes the immediate issue, determine if chrome prerendered the page and never actually displays it, are we leaking memory?
 var initSent = false; //This is a flag that is used to work around page being prerendered and background page not being able to talk to it.
 
@@ -42,19 +44,20 @@ function loggedIn() {
     if (document.getElementById("header_login_info") != null) {
         retVal = true;
     }
-
-    var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
-    var title = head.getElementsByTagName("title")[0].textContent;
-    if (title == "Ingress Intel Map") {
-        return true;
+    else{
+        var title = head.getElementsByTagName("title")[0].textContent;
+        if (title == "Ingress Intel Map") {
+            retVal = true;
+        }
+        else if (title == "Ingress") {
+            retVal = false;
+        }
+        else {
+            console.error('It seems that the title of the page is not the login or the map as expected... this is what it is: ' + title);
+            retVal = false;
+        }
     }
-    else if (title == "Ingress") {
-        return false;
-    }
-    else {
-        console.error('It seems that the title of the page is not the login or the map as expected... this is what it is: ' + title);
-        return false;
-    }
+    return retVal;    
 }
 
 function getDashboardURI()
@@ -90,7 +93,6 @@ function getDashboardURI()
  * at release only fire for ingress pages. Anyway the reason we have an injectScript.js file at all is because contentScript can not access the pages window variables
  * just dom.
  */
-var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
 var script = document.createElement('script');
     script.setAttribute("type", "text/javascript");
     script.setAttribute("async", true);
@@ -139,6 +141,13 @@ chrome.extension.onMessage.addListener(
             var event = new CustomEvent("REQ-GET_VIEW", {"detail":"please" });
             document.dispatchEvent(event);
             //console.log('conentScript sent request to the injectedpage for the view info.');
+        }
+        else if (request.request == "GET_PLAYER_TEAM") {
+            //console.log('ContentScript requested to load a view.');
+            //set up how to handle the response
+            
+            sendResponse({ teamName: getPlayerTeam() }, function () {/*this is so we dont get error because background sent back a thanks*/
+                });
         }
         else if (request.request == "HIDE_PII") {
             //console.log('ContentScript requested to hide pii');
@@ -200,6 +209,8 @@ chrome.extension.onMessage.addListener(
                 document.dispatchEvent(event);
                 
                 fixSelectables();
+                adjustCommStyle();
+                adjustDeveloperFilterStyle();
             }
             requestUserLocation(initInjected);
 
@@ -345,10 +356,13 @@ function hidePII(hide, callback) {
             screenshotStyle = document.createElement('style');
             screenshotStyle.setAttribute("type", "text/css");
             screenshotStyle.appendChild(document.createTextNode(screenshotCSS));
-            screenshotStyle.addEventListener('load', function () {
+            var screenshotStyleWatch = function () {
+                screenshotStyle.removeEventListener('load', screenshotStyleWatch, false);
                 callback();
-            }, false);
+            }
+            screenshotStyle.addEventListener('load', screenshotStyleWatch, false);
             /*test success*/
+           //NOTE: aslong as we add the listenerbefore code is actually added to the page below, we are fine.
             head.appendChild(screenshotStyle);
             console.log('sent append style');
 
@@ -387,6 +401,82 @@ function fixSelectables() {
 
     } catch (e) {
         console.error('There was a problem making loading... unselectable: \n' + locus + '\n' + e.message);
+    }
+}
+
+var commStyle;
+function adjustCommStyle() {
+    var locus = "";
+
+    var commCSS = ""; //fill it out then append
+    try {
+            if (userData.userSettings.comm_show_portal_addresses === "hide") {
+                locus = "Creating portal address hide CSS.";
+                commCSS += "span.pl_portal_address {display: none;}\n";
+            }
+            
+            if (userData.userSettings.comm_agentur_readability_css === "on") {
+                locus = "Adding root's Tweaks.";
+                commCSS += "#comm, .pl_timestamp {font-size: 11px;}\n"
+                commCSS += "#comm .comm_expanded {position: absolute; top: 0; bottom: 0;}\n";
+                commCSS += "#plexts {background: #1D2525; font-family: Tahoma, Arial, Helvetica, sans-serif; font-size: 11px;}\n";
+                commCSS += ".pl_content {line-height: 11px; padding: 0;}\n";
+                commCSS += ".pl_portal_name {color: #ecc979; text-decoration: none;}\n";
+                commCSS += ".pl_timestamp {color: #eee;}\n";
+                commCSS += ".pl_timestamp_spacer {height: 15px;}\n";
+                commCSS += "@media (min-height: 800px) {.comm_expanded #plext_container {height: 46rem;}}\n";
+            }
+            
+            if(commCSS.length>0)
+            {
+                console.log('commCSS: ' + commCSS);
+                commStyle = document.createElement('style');
+                commStyle.setAttribute("type", "text/css");
+                commStyle.appendChild(document.createTextNode(commCSS));
+                locus = "Appending Comm Style.";
+                head.appendChild(commStyle);
+                console.log('sent append style');
+            }
+            else if(typeof commStyle !== "undefined")
+            {
+                document.removeChild(commStyle);
+            }
+    } catch (e) {
+        console.error('There was a problem adjusting the comm style: \n' + locus + '\n' + e.message);
+    }
+}
+
+var developerFilterStyle;
+function adjustDeveloperFilterStyle() {
+    var locus = "";
+
+    var developerFilterCSS = ""; //fill it out then append
+    try {
+            if (userData.userSettings.dev_map_filter_mode === "wwii") {
+                locus = "adding wwii mode to css";
+                developerFilterCSS += "body {-webkit-filter: grayscale(100%) invert(100%);}";
+            }
+            else if(userData.userSettings.dev_map_filter_mode === "sepia") {
+                locus = "adding sepia mode to css";
+                developerFilterCSS += "body {-webkit-filter: sepia(100%) invert(100%);}";
+            }
+            
+            if(developerFilterCSS.length>0)
+            {
+                console.log('developerFilterStyle: ' + developerFilterCSS);
+                developerFilterStyle = document.createElement('style');
+                developerFilterStyle.setAttribute("type", "text/css");
+                developerFilterStyle.appendChild(document.createTextNode(developerFilterCSS));
+                locus = "Appending developerFilterStyle.";
+                head.appendChild(developerFilterStyle);
+                console.log('sent append style');
+            }
+            else if(typeof developerFilterStyle !== "undefined")
+            {
+                document.removeChild(developerFilterStyle);
+            }
+    } catch (e) {
+        console.error('There was a problem adjusting the developerFilterStyle style: \n' + locus + '\n' + e.message);
     }
 }
 
@@ -473,6 +563,48 @@ function handleVisibilityChange() {
             sendInitEvent();
         }
     }
+}
+
+//"GET_PLAYER_TEAM"
+//The idea was I could avoid going to the injectScript to find out, but ofcourse it is not consistant for IITC.
+function getPlayerTeam()
+{
+    var team;
+    
+    if(transientData.IITCDetected == false)
+    {
+        team = document.querySelector(".player_nickname").parentElement.className;
+    }
+    else
+    {
+        if(document.querySelector("#name").querySelectorAll(".enl").length > 0)
+        {
+            team = "ALIENS"
+        }
+        else if(document.querySelector("#name").querySelectorAll(".res").length > 0)
+        {
+            team = "RESISTANCE"
+        }
+        else
+        {
+            team = "unknown";
+        }
+    }
+    
+    if(team === "ALIENS")
+    {
+        team = "enlightened";
+    }
+    else if(team === "RESISTANCE")
+    {
+        team = "resistance";
+    }
+    else
+    {
+        team = "unknown";
+    }
+    console.log("Determined player to be a %s agent.", team);
+    return(team);
 }
 
 //We should probably make sure this is only added once, but since this is a content script it should be true.

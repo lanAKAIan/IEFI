@@ -27,6 +27,8 @@ function initPopup()
 	document.getElementById("menu_screenshot").addEventListener('click', POPUP.saveScreenshot);
 	document.getElementById("menu_about").addEventListener('click', loadAboutPage);
 	document.getElementById("menu_options").addEventListener('click', displayOptions);
+	
+	setTheme(backgroundPage);
 
 	//document.getElementById("DEBUG_MENU_ITEM").addEventListener('click', function(){});
 	//Populate the user's list of views
@@ -104,7 +106,7 @@ var POPUP = (function(){
 			newViewLink.setAttribute("class","horizontalFlex menuRow");
 			newViewLink.addEventListener('click', function(){POPUP.loadView(view)}, false);
 		var icon = document.createElement("img");
-		icon.setAttribute("src", "res/ic_menu_mapmode.png");
+		icon.setAttribute("class", "mapView");
 		newViewLink.appendChild(icon);
 		var nameCell = document.createElement("div");
 		nameCell.setAttribute("class","box1");
@@ -118,7 +120,7 @@ var POPUP = (function(){
 		}
 		newViewLink.appendChild(nameCell);
 		icon = document.createElement("img");
-		icon.setAttribute("src", "res/ic_menu_delete.png");
+		icon.setAttribute("class", "trashView");
 		icon.addEventListener('click', function(event){POPUP.removeView(view, this); event.stopPropagation();}, false);
 		newViewLink.appendChild(icon);		
 		document.getElementById('viewList').appendChild(newViewLink);

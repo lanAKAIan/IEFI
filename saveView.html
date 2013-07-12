@@ -3,6 +3,7 @@
 <head>
     <title>Intelligence Enhancer for Ingress - Save View</title>
     <LINK href="combo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="Utilities.js"></script>
     <script type="text/javascript" src="saveView.js"></script>
 </head>
 <body>
@@ -12,11 +13,11 @@
             <div id="directLinkIntel" class="horizontalFlex">
                 <div class="box0"> View Name: </div>
                 <div class="box1"><input id="input_saveViewName" class="saveName" placeholder="enter view name"></div>
-                <div class="box0"><img id="performSaveButton" src="res/ic_menu_save.png" title="Save View"></div>
+                <div class="box0"><img id="performSaveButton" class="saveButton" title="Save View"></div>
             </div>
-            <div id="notifyStatus"></div>
+            <div id="notifyStatus"> </div>
         </fieldset>
-        <div id="closeDiv"><img id="closeButton" src="res/ic_menu_close_clear_cancel.png" title="Cancel"></div>
+        <div id="closeDiv"><img id="closeButton" title="Close" class="closeButton"></div>
     </form>
 </body>
 </html>
