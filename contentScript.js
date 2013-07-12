@@ -566,9 +566,31 @@ function handleVisibilityChange() {
 }
 
 //"GET_PLAYER_TEAM"
+//The idea was I could avoid going to the injectScript to find out, but ofcourse it is not consistant for IITC.
 function getPlayerTeam()
 {
-    var team = document.querySelector(".player_nickname").parentElement.className;
+    var team;
+    
+    if(transientData.IITCDetected == false)
+    {
+        team = document.querySelector(".player_nickname").parentElement.className;
+    }
+    else
+    {
+        if(document.querySelector("#name").querySelectorAll(".enl").length > 0)
+        {
+            team = "ALIENS"
+        }
+        else if(document.querySelector("#name").querySelectorAll(".res").length > 0)
+        {
+            team = "RESISTANCE"
+        }
+        else
+        {
+            team = "unknown";
+        }
+    }
+    
     if(team === "ALIENS")
     {
         team = "enlightened";
