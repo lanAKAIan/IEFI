@@ -2,12 +2,12 @@ THERE IS CURRENTLY A KNOWN ISSUE
 in which the ingress page will get stuck at "Loading Data..." and will not paint any of the map or the chatlog. 
 This only appears to happen once per session.
 
-If this happens, just hit reload on the page and it will fix the issue. I am currently investigating the cause. My apologies.
+If this happens, just hit reload on the page should fix the issue. It is an issue I have been working against.
 ========================================================
 
 Provides additional functionality for Google's Ingress Intel Map, without adversely affecting Google's Servers.
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
-1.5.0.21
+1.5.0.22
 New Features:
 * Added theme capability for the extension, based on the user's faction. Can be overridden in the options page.
 * Added some comm adjustment options(off by default) including:
