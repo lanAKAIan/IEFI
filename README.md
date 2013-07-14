@@ -38,3 +38,5 @@ https://github.com/jonatkins/ingress-intel-total-conversion
 This project is for the ingress community and with any luck by the ingress community. If a feature would be helpful
 to you, it likely would be helpful to others. Consider submitting a feature request. If you are a developer,
 consider joining the project.
+
+include: ["google68d264f06c110290.html"]
