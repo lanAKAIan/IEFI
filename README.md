@@ -3,7 +3,6 @@ IEFI - Intelligence Enhancer for Ingress
 A Chrome extension providing enhancements to the Ingress intel site
 
 NOTE: this project was previously hosted at https://code.google.com/p/intelligence-enhancer-for-ingress/
-<meta name="google-site-verification" content="HXbMvUzcC6DDVV6DAXr9JQirsLI5bBwrAmvaE56BWdQ" />
 
 The primry goal of the IEFI project is to provide enhanced functionality to the ingress.com/intel site in a way that
 does not adversely affect Google's Servers, the Ingress Community, and stays in the "spirit of Ingress." The project 
