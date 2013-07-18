@@ -59,6 +59,7 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                             , "screenshot_visibility_link":     "hide"
                             , "screenshot_visibility_advertise":"show"
                             , "screenshot_visibility_zoom"     :"show"
+                            , "screenshot_visibility_filter":   "show"
                             , "auto_load_fresh":                "world"
                             , "auto_load_page":                 "last"
                             , "auto_load_geo_zoom":             15
@@ -213,9 +214,6 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                 case "1.3.2.2":
                     addMissingSettings();
                     break;
-                case "1.3.2.2":
-                    addMissingSettings();
-                    break;
                 case "1.4.0.1":
                     addMissingSettings();
                     break;
@@ -226,6 +224,9 @@ if(!IPP.StorageManager){ IPP.StorageManager = {} };
                     addMissingSettings();
                     break;
                 case "1.5.0.5":
+                    addMissingSettings();
+                    break;
+                case "1.5.0.22":
                     addMissingSettings();
                     break;
                 default:

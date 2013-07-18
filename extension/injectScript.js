@@ -129,13 +129,13 @@ if(!IPP.Injected){ IPP.Injected = {} };
 
     function setUpKnownHooks()
     {
-        hooks.getMap            = function(){return (Fd.g().p); } /*DASHBOARD_UPDATE_LINE in doGeocode, then in input91*/
+        hooks.getMap            = function(){return (U.f().q); } /*DASHBOARD_UPDATE_LINE in doGeocode, then in input91ish*/
         hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(vd(name)) }; /*DASHBOARD_UPDATE_LINE*/
-        hooks.dashboardConstructor = Gf; /*DASHBOARD_UPDATE_LINE*/
+        hooks.valueFromCookie   = function(name){ return(Me(name)) }; /*DASHBOARD_UPDATE_LINE in input72ish*/
+        hooks.dashboardConstructor = ng; /*DASHBOARD_UPDATE_LINE in input96ish*/
     }
 
     function identifyHooks()
@@ -214,7 +214,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //visually fix
                     newLine += "\nIPP.Injected.swapClass('tab_selected', document.getElementById('pl_tab_fac'), document.getElementById('pl_tab_all'))";
 
-                replaceInFunction("Gf",commVar[0],commVar[0]+newLine); /*DASHBOARD_UPDATE_LINE*/
+                replaceInFunction("ng",commVar[0],commVar[0]+newLine); /*DASHBOARD_UPDATE_LINE this is the same text as hooks.dashboardConstructor*/
             }
 
 
@@ -238,7 +238,7 @@ if(!IPP.Injected){ IPP.Injected = {} };
                 //find alternate method for Oe - hooks.valueFromCookie
                 var state = hasProperties(MAP_PARAMS) ? (hooks.valueFromCookie("lat") ? "newPage" : "fresh") : "directLink";
                 //1.3.1.0 - so we were using the hook for dashboard constructor here... but it was a pointer to the old function... need to create hooks later, or remember to update.
-                var matches = signatures.dashboardConst.exec(Gf.toString()); /*DASHBOARD_UPDATE_LINE*/
+                var matches = signatures.dashboardConst.exec(ng.toString()); /*DASHBOARD_UPDATE_LINE this is the same as hooks.dashboardConstructor*/
                 //  matches[0] - whole thing
                 //  matches[1] - before zoom
                 //  matches[2] - zoomLevel variable

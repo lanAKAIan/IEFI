@@ -6,7 +6,14 @@ If this happens, just hit reload on the page should fix the issue. It is an issu
 ========================================================
 
 Provides additional functionality for Google's Ingress Intel Map, without adversely affecting Google's Servers.
+
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
+release channel moving to github: http://lanakaian.github.io/IEFI/
+1.5.1.0
+* Compatibility update for dashboard update on 07/17/13 in order to remove the warning... functionality did not break.
+New Features:
+* Screenshots can hide the portal filters.
+
 1.5.0.22
 New Features:
 * Added theme capability for the extension, based on the user's faction. Can be overridden in the options page.
@@ -21,10 +28,6 @@ Bug Fixes:
 * cleaning up the code structure a bit for stability improvements including
 * added missing listener removal for screenshot CSS.
 * modified the load order of extension components and refactored to remove some dependencies.
-
-1.4.4.0
-* Compatibility update for dashboard update on 06/10/13 in order to remove the harassment... functionality did not break.
-* Fixed a bug in which when setting the default chat mode to "All" the tab would still visually appear to be "Faction". The mode on the actual chat content was correct however.
 
 Changelog for Prior Versions:
 http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog
