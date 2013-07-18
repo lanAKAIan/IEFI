@@ -9,7 +9,7 @@ Provides additional functionality for Google's Ingress Intel Map, without advers
 
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
 release channel moving to github: http://lanakaian.github.io/IEFI/
-1.5.1.0
+1.5.1.1
 * Compatibility update for dashboard update on 07/17/13 in order to remove the warning... functionality did not break.
 New Features:
 * Screenshots can hide the portal filters.
