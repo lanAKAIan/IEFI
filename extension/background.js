@@ -205,6 +205,7 @@ function getPlayerTeam( callback )
                 if(callback != undefined)
                 {
                     cachedTeam = response.teamName;
+                    console.log("GET_PLATER_TEAM returned: %o", response);
                     callback(cachedTeam);
                 }
             });

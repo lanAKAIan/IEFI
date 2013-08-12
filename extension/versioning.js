@@ -79,7 +79,8 @@ var versionTree = [ { "version": "1.0.0.0" , "compatible": dashboardHashes[ 0], 
 				   ,{ "version": "1.5.0.22", "compatible": dashboardHashes[11], upgradeProcess: false }
 				   ,{ "version": "1.5.1.1",  "compatible": dashboardHashes[12], upgradeProcess: true  }
 				   ,{ "version": "1.5.2.0",  "compatible": dashboardHashes[13], upgradeProcess: false }
-				   ,{ "version": "1.5.3.0",  "compatible": dashboardHashes[14], upgradeProcess: false } ];
+				   ,{ "version": "1.5.3.0",  "compatible": dashboardHashes[14], upgradeProcess: false }
+				   ,{ "version": "1.5.3.1",  "compatible": dashboardHashes[14], upgradeProcess: false } ];
 
 if(versionTree[versionTree.length -1].version !== currentVersion)
 {

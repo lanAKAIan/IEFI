@@ -595,7 +595,7 @@ function getPlayerTeam()
         }
     }
     
-    if(team === "ALIENS")
+    if(team === "ENLIGHTENED" || team === "ALIENS") //In the dashboard update on 2013.08.02 ALIENS became enlightened.
     {
         team = "enlightened";
     }
