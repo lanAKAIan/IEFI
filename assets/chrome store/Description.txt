@@ -12,7 +12,7 @@ release channel moving to github: http://lanakaian.github.io/IEFI/
 1.5.3.1
 * Compatibility update for dashboard update on 08/08/2013.
 * Hiding "Other Clutter" now hidess the Ingress Report badge.
-* Fixed a bug in which Enlightened players were not able to be detected for the "faction" choice on themes. Niantec internally referes to them as enlightened now instead of aliens.
+* Fixed a bug in which enlightened players were not able to be detected for the "faction" choice on themes. Niantic internally refers to them as enlightened now instead of aliens.
 1.5.2.0
 * Compatibility update for dashboard update on 08/01/2013.
 1.5.1.1
