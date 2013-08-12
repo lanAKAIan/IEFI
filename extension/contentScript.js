@@ -331,11 +331,10 @@ function hidePII(hide, callback) {
             if (userData.userSettings.screenshot_visibility_clutter == "hide") {
                 locus = "hiding other clutter";
                 //screenshotCSS += "#nav,#header_links,#header_links_box,#header_invites,#header_invites_box,";
-                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,#header_maplink,";
+                screenshotCSS += ".nav_link,#header_links,#header_links_box,#header_invites,#header_invites_box,#header_maplink,#play_button,";
             }
             if (userData.userSettings.screenshot_visibility_filter == "hide") {
-                locus = "hiding other clutter";
-                //screenshotCSS += "#nav,#header_links,#header_links_box,#header_invites,#header_invites_box,";
+                locus = "hiding filters";
                 screenshotCSS += "#filters_container,#portal_filter_header,";
             }
             //now that we have what we want to apply, lets add the style. replace last ,. need to deal with empty
