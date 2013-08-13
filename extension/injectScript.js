@@ -127,15 +127,15 @@ if(!IPP.Injected){ IPP.Injected = {} };
         console.log('done Setting up init... waiting on IPP-INITIALISED-EVENT.');
 	}
 
-    var dashboardConstFuncName = "Rg"; /*DASHBOARD_UPDATE_LINE in input96ish*/
+    var dashboardConstFuncName = "Xh"; /*DASHBOARD_UPDATE_LINE in input 120ish*/
     function setUpKnownHooks()
     {
-        hooks.getMap            = function(){return (U.f().h); } /*DASHBOARD_UPDATE_LINE in doGeocode, then in input 100ish*/
+        hooks.getMap            = function(){return (U.g().i); } /*DASHBOARD_UPDATE_LINE in doGeocode, input 83ish, then in input 118ish*/
         hooks.panTo             = function(point){ return(hooks.getMap().panTo(point)); };
         hooks.getCenter         = function(){ return(hooks.getMap().getCenter())};
         hooks.setZoom           = function(zoomLevel){ return(hooks.getMap().setZoom(zoomLevel)); };
         hooks.getZoom           = function(){ return(hooks.getMap().getZoom()); };
-        hooks.valueFromCookie   = function(name){ return(Ze(name)) }; /*DASHBOARD_UPDATE_LINE in input 73ish*/
+        hooks.valueFromCookie   = function(name){ return(lg(name)) }; /*DASHBOARD_UPDATE_LINE in input 94ish*/
         hooks.dashboardConstructor = window[dashboardConstFuncName];
     }
 
