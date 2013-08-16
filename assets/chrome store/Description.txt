@@ -9,6 +9,8 @@ Provides additional functionality for Google's Ingress Intel Map, without advers
 
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
 release channel moving to github: http://lanakaian.github.io/IEFI/
+1.5.7.0
+* Looks like niantic reverted the dashboard to the version on 08/13/2013, so this rolls back todays compatibility patch for dashboard update on 08/15/2013.  All in a day's work it seems.
 1.5.6.0
 * Compatibility patch for dashboard update on 08/15/2013.
 1.5.1.1 - 1.5.5.0
