@@ -9,35 +9,13 @@ Provides additional functionality for Google's Ingress Intel Map, without advers
 
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
 release channel moving to github: http://lanakaian.github.io/IEFI/
-1.5.5.0
-* Compatibility update for dashboard update on 08/13/2013.
-1.5.4.0
-* Compatibility update for dashboard update on 08/12/2013.
-1.5.3.1
-* Compatibility update for dashboard update on 08/08/2013.
+1.5.6.0
+* Compatibility patch for dashboard update on 08/15/2013.
+1.5.1.1 - 1.5.5.0
+* Compatibility patches for dashboard updates on 08/13/2013, 08/12/2013, 08/08/2013, 08/01/2013, 07/17/13.
 * Hiding "Other Clutter" now hides the Ingress Report badge.
 * Fixed a bug in which enlightened players were not able to be detected for the "faction" choice on themes. Niantic internally refers to them as enlightened now instead of aliens.
-1.5.2.0
-* Compatibility update for dashboard update on 08/01/2013.
-1.5.1.1
-* Compatibility update for dashboard update on 07/17/13 in order to remove the warning... functionality did not break.
-New Features:
 * Screenshots can hide the portal filters.
-
-1.5.0.22
-New Features:
-* Added theme capability for the extension, based on the user's faction. Can be overridden in the options page.
-* Added some comm adjustment options(off by default) including:
- . Ability to turn off portal addresses in the chatlog.
- . Bertram Simon's comm readability CSS improvements.
-* Added a "Developer Options" section which will be a place to contain some settings that may or may not stay. The real reason was to make things easier on me.
- . A theme option with Bertram Simon's WWII bombing map and a tweaked version of the bombing map using inverted sepia. These are just kinda fun, not necessarily useful.
- . force incompatability option - truly a developer setting
-
-Bug Fixes:
-* cleaning up the code structure a bit for stability improvements including
-* added missing listener removal for screenshot CSS.
-* modified the load order of extension components and refactored to remove some dependencies.
 
 Changelog for Prior Versions:
 http://code.google.com/p/intelligence-enhancer-for-ingress/wiki/Changelog
