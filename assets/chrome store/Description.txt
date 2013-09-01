@@ -9,6 +9,8 @@ Provides additional functionality for Google's Ingress Intel Map, without advers
 
 Official release channel of http://code.google.com/p/intelligence-enhancer-for-ingress/
 release channel moving to github: http://lanakaian.github.io/IEFI/
+1.5.11.1
+* Compatibility patch for dashbaord update on 08/31/2013.
 1.5.10.0
 * Compatibility patch for dashbaord update on 08/27/2013.
 1.5.9.0
